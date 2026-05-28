@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { generateTeacherResponse } from "@/lib/gemini/client";
 import { teacherRequestSchema } from "@/lib/teacher/types";
 
@@ -9,21 +10,17 @@ export async function POST(request: Request): Promise<NextResponse> {
     const response = await generateTeacherResponse(parsedPayload);
     return NextResponse.json({ data: response }, { status: 200 });
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      const isValidationError = error.name === "ZodError";
+    if (error instanceof z.ZodError) {
       return NextResponse.json(
-        {
-          error: isValidationError ? "Invalid request payload." : error.message,
-        },
-        { status: isValidationError ? 400 : 500 },
+        { error: "Invalid request payload." },
+        { status: 400 },
       );
     }
 
-    return NextResponse.json(
-      {
-        error: "Unexpected server error.",
-      },
-      { status: 500 },
-    );
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ error: "Unexpected server error." }, { status: 500 });
   }
 }

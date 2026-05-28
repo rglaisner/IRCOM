@@ -2,30 +2,119 @@
   "programTitle": "IRCOM Applied Generative AI Program",
   "centralGoal": "Turn AI into a high-quality production assistant with critical human oversight for strategic communication.",
   "evaluationCriteria": [
-    "Strategic relevance of produced content",
+    "Strategic relevance of produced content (publishable by a brand?)",
     "Operational mastery of multi-tool workflows",
-    "Critical thinking about AI limits"
+    "Critical thinking about AI limits during restitution"
+  ],
+  "guardrails": [
+    "AI is an assistant, not the final source of ideas",
+    "Avoid generic AI writing style and empty phrasing",
+    "Always justify strategic choices"
+  ],
+  "blocks": [
+    {
+      "id": 1,
+      "title": "Prompt foundations & strategic copy",
+      "subtitle": "3h — From Google query to agency brief",
+      "mode": "coach",
+      "href": "/coach",
+      "accentColor": "#3B74F7",
+      "recommendedTools": ["claude", "gemini", "chatgpt"],
+      "objectives": [
+        "Structure a brief: Role, Context, Objective, Constraints, Format",
+        "Define tone of voice and editorial charter",
+        "Turn a press release into LinkedIn/Instagram posts"
+      ],
+      "workshopPrompts": [
+        "Transform this press release into a punchy LinkedIn thread (3 posts).",
+        "Rewrite this draft removing generic AI phrasing."
+      ],
+      "sampleBrief": "Corporate client launching a sustainable mobility service for urban professionals."
+    },
+    {
+      "id": 2,
+      "title": "Art direction & visual production",
+      "subtitle": "3h — Think like a creative director",
+      "mode": "exercise",
+      "href": "/exercise?tab=visual",
+      "accentColor": "#F05872",
+      "recommendedTools": ["firefly", "gemini"],
+      "objectives": [
+        "Describe styles, angles, lighting, palettes in prompts",
+        "Produce campaign visuals respecting brand constraints",
+        "Discuss legal and ethical limits of AI imagery"
+      ],
+      "workshopPrompts": [
+        "Create carousel key visuals for the campaign from block 1.",
+        "Critique this visual for brand fit and AI clichés."
+      ],
+      "sampleBrief": "Banner and carousel assets for the LinkedIn campaign."
+    },
+    {
+      "id": 3,
+      "title": "Short video & declination logic",
+      "subtitle": "3h — Scripts for Reels, TikTok, Shorts",
+      "mode": "exercise",
+      "href": "/exercise?tab=script",
+      "accentColor": "#FEBA31",
+      "recommendedTools": ["gemini", "claude"],
+      "objectives": [
+        "Structure a 30-second script: hook, body, CTA",
+        "Decline a long article into video script + infographic outline"
+      ],
+      "workshopPrompts": [
+        "Turn this 1000-word article into a dynamic 30s script.",
+        "Storyboard three shots for the hook."
+      ],
+      "sampleBrief": "30s Reel script promoting the mobility launch."
+    },
+    {
+      "id": 4,
+      "title": "Agency sprint & critical review",
+      "subtitle": "3h — Rush + Grand Oral",
+      "mode": "sprint",
+      "href": "/sprint",
+      "accentColor": "#071554",
+      "recommendedTools": ["claude", "firefly", "gemini"],
+      "objectives": [
+        "Deploy a full content ecosystem under time pressure",
+        "Justify tool choices and human finishing",
+        "Present with critical restitution (not AI magic)"
+      ],
+      "workshopPrompts": [
+        "Client brief: crisis communication after a product recall.",
+        "Client brief: promote a corporate cultural event."
+      ],
+      "sampleBrief": "Advertiser wants a launch kit: posts, visuals, 30s video script in 2 hours."
+    }
   ],
   "modules": {
     "coach": {
       "title": "Interactive coach",
       "focus": "Block 1: Prompt structure and strategic copywriting",
-      "expectedDeliverable": "Clear social media message with context, tone, constraints, and format"
+      "expectedDeliverable": "Clear social media message with context, tone, constraints, and format",
+      "interactionScripts": {
+        "1": "Diagnose the student brief: missing role, weak constraints, or vague objective.",
+        "2": "Propose a revised agency brief and one improved sample post."
+      }
     },
     "exercise": {
-      "title": "Practice exercise",
+      "title": "Practice workshop",
       "focus": "Blocks 2-3: Visual direction and short-format adaptation",
-      "expectedDeliverable": "Revised proposal after AI critique and human improvement"
+      "expectedDeliverable": "Revised proposal after AI critique and human improvement",
+      "interactionScripts": {
+        "1": "Critique the draft for strategic fit, AI clichés, and visual/script coherence.",
+        "2": "Guide one concrete revision path and quality checklist for publish-ready output."
+      }
     },
     "sprint": {
       "title": "Agency sprint simulation",
       "focus": "Block 4: Advertiser brief, multi-format production, critical review",
-      "expectedDeliverable": "Mini campaign kit with text, visual concept, and short video script"
+      "expectedDeliverable": "Mini campaign kit with text, visual concept, and short video script",
+      "interactionScripts": {
+        "1": "Issue a realistic advertiser mission with deliverable checklist and 2h rush framing.",
+        "2": "Run Grand Oral critique: strategic coherence, human finish, tool justification."
+      }
     }
-  },
-  "guardrails": [
-    "AI is an assistant, not the final source of ideas",
-    "Avoid generic AI writing style and empty phrasing",
-    "Always justify strategic choices"
-  ]
+  }
 }

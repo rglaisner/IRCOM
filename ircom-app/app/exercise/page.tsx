@@ -1,40 +1,28 @@
 "use client";
 
+import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
-import { ModeInteraction } from "@/components/mode-interaction";
+import { LangSync } from "@/components/lang-sync";
+import { ExerciseMode } from "@/components/modes/exercise-mode";
 import { useTeacherState } from "@/components/teacher-app";
 
 export default function ExercisePage() {
-  const {
-    language,
-    progress,
-    registerInteraction,
-    getHistory,
-    appendHistory,
-    updateLanguage,
-  } = useTeacherState();
+  const state = useTeacherState();
 
   return (
-    <AppShell language={language} onLanguageChange={updateLanguage}>
-      <ModeInteraction
-        mode="exercise"
-        language={language}
-        progress={progress}
-        registerInteraction={registerInteraction}
-        getHistory={getHistory}
-        appendHistory={appendHistory}
-        title={language === "fr" ? "Mode Exercice" : "Exercise Mode"}
-        description={
-          language === "fr"
-            ? "Soumets une proposition, puis ameliore-la apres critique."
-            : "Submit a draft, then improve it after AI critique."
-        }
-        placeholder={
-          language === "fr"
-            ? "Exemple: Voici mon carrousel Instagram de campagne..."
-            : "Example: Here is my campaign Instagram carousel draft..."
-        }
-      />
-    </AppShell>
+    <>
+      <LangSync language={state.language} />
+      <AppShell language={state.language} onLanguageChange={state.updateLanguage}>
+        <Suspense fallback={<p className="ircom-secondary text-sm">…</p>}>
+          <ExerciseMode
+            language={state.language}
+            progress={state.progress}
+            registerInteraction={state.registerInteraction}
+            getHistory={state.getHistory}
+            appendHistory={state.appendHistory}
+          />
+        </Suspense>
+      </AppShell>
+    </>
   );
 }

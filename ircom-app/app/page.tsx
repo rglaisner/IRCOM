@@ -2,61 +2,89 @@
 
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
+import { LangSync } from "@/components/lang-sync";
 import { useTeacherState } from "@/components/teacher-app";
-
-const modeCards = [
-  { key: "coach", href: "/coach", titleFr: "Coach", titleEn: "Coach" },
-  {
-    key: "exercise",
-    href: "/exercise",
-    titleFr: "Exercice",
-    titleEn: "Exercise",
-  },
-  { key: "sprint", href: "/sprint", titleFr: "Sprint", titleEn: "Sprint" },
-] as const;
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { t } from "@/lib/copy/ui-messages";
+import { getCurriculum } from "@/lib/teacher/content";
+import { getInteractionCount } from "@/lib/teacher/progress";
 
 export default function Home() {
   const { language, progress, updateLanguage } = useTeacherState();
+  const curriculum = getCurriculum(language);
+  const modes = ["coach", "exercise", "sprint"] as const;
+
+  const totalCompleted = modes.reduce(
+    (sum, mode) => sum + getInteractionCount(progress, mode),
+    0,
+  );
+  const totalTarget = modes.length * 2;
 
   return (
-    <AppShell language={language} onLanguageChange={updateLanguage}>
-      <main className="grid gap-4">
-        <section className="rounded-xl border border-black/10 bg-white p-5 shadow-sm dark:border-white/15 dark:bg-zinc-900">
-          <h2 className="text-xl font-semibold">
-            {language === "fr"
-              ? "Parcours IRCOM - Assistant Pedagogique"
-              : "IRCOM Learning Path - Teaching Assistant"}
-          </h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-            {language === "fr"
-              ? "Objectif MVP: terminer au moins 2 interactions dans chaque mode."
-              : "MVP target: complete at least 2 interactions in each mode."}
+    <>
+      <LangSync language={language} />
+      <AppShell language={language} onLanguageChange={updateLanguage}>
+        <section className="space-y-2">
+          <h2 className="ircom-heading text-2xl font-semibold">{t(language, "journeyTitle")}</h2>
+          <p className="ircom-body text-sm leading-relaxed">{t(language, "journeySubtitle")}</p>
+          <p className="ircom-secondary text-xs">
+            {language === "fr" ? "Bac+5 — Alternance" : "Master — Work-study"}
           </p>
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-3">
-          {modeCards.map((card) => (
-            <article
-              key={card.key}
-              className="rounded-xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/15 dark:bg-zinc-900"
-              data-testid={`${card.key}-progress-card`}
-            >
-              <h3 className="text-lg font-semibold">
-                {language === "fr" ? card.titleFr : card.titleEn}
-              </h3>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                {progress[card.key].interactionsCompleted} / 2
+        <ProgressBar
+          value={totalCompleted}
+          max={totalTarget}
+          label={t(language, "progressLabel")}
+        />
+
+        <section className="grid gap-3 sm:grid-cols-3" aria-label="Mode progress">
+          {modes.map((mode) => (
+            <Card key={mode} data-testid={`${mode}-progress-card`}>
+              <p className="ircom-heading text-sm font-medium capitalize">{mode}</p>
+              <p className="ircom-secondary mt-1 text-sm">
+                {getInteractionCount(progress, mode)} / 2
               </p>
-              <Link
-                href={card.href}
-                className="mt-3 inline-flex rounded-md bg-black px-3 py-1.5 text-sm text-white dark:bg-white dark:text-black"
-              >
-                {language === "fr" ? "Ouvrir" : "Open"}
-              </Link>
-            </article>
+            </Card>
           ))}
         </section>
-      </main>
-    </AppShell>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {curriculum.blocks.map((block) => {
+            const modeProgress =
+              block.mode === "coach"
+                ? progress.coach
+                : block.mode === "exercise"
+                  ? progress.exercise
+                  : progress.sprint;
+
+            return (
+              <Card
+                key={block.id}
+                accentColor={block.accentColor}
+                data-testid={`block-${block.id}-card`}
+              >
+                <Badge color={block.accentColor}>
+                  {t(language, "blockLabel")} {block.id}
+                </Badge>
+                <h3 className="ircom-heading mt-2 text-lg font-semibold">{block.title}</h3>
+                <p className="ircom-secondary mt-1 text-sm">{block.subtitle}</p>
+                <p className="ircom-secondary mt-3 text-sm">
+                  {modeProgress.interactionsCompleted} / 2 — {t(language, "sessionsTarget")}
+                </p>
+                <Link
+                  href={block.href}
+                  className="mt-4 inline-flex min-h-[var(--ircom-touch-min)] items-center justify-center rounded-[var(--ircom-radius-pill)] bg-[var(--ircom-blue)] px-4 text-sm font-medium text-[var(--ircom-text-on-navy)] hover:opacity-90"
+                >
+                  {t(language, "openMode")}
+                </Link>
+              </Card>
+            );
+          })}
+        </div>
+      </AppShell>
+    </>
   );
 }

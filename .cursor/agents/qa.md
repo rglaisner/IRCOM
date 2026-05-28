@@ -24,3 +24,4 @@ Provide fast confidence using vibe-check tests first, then expand to edge and re
 - Core flow and key failure behavior are validated.
 - Test outcomes are reproducible and actionable.
 - Any uncovered risk is explicitly documented for follow-up.
+- For user-visible changes: Consumer UX Gatekeeper **Ship** recorded (or human override noted); regressions note J1–J4 (Polish, Clarity, Trust, Delight) when relevant.

@@ -1,0 +1,85 @@
+import type { SupportedLanguage } from "@/lib/teacher/types";
+
+type MessageKey =
+  | "productTitle"
+  | "productSubtitle"
+  | "navDashboard"
+  | "navCoach"
+  | "navExercise"
+  | "navSprint"
+  | "languageLabel"
+  | "journeyTitle"
+  | "journeySubtitle"
+  | "blockLabel"
+  | "openMode"
+  | "progressLabel"
+  | "sessionsTarget"
+  | "submit"
+  | "submitting"
+  | "errorGeneric"
+  | "errorOffline"
+  | "errorApiKey"
+  | "qualityMeter"
+  | "exportSprint"
+  | "toolRouterTitle"
+  | "pasteBackTitle";
+
+const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
+  fr: {
+    productTitle: "Ircom",
+    productSubtitle: "Studio IA — Management & Communication",
+    navDashboard: "Parcours",
+    navCoach: "Coach",
+    navExercise: "Atelier",
+    navSprint: "Sprint",
+    languageLabel: "Langue",
+    journeyTitle: "Parcours formation — 12 h",
+    journeySubtitle:
+      "Quatre blocs pratiques : prompt, visuel, format court, sprint agence. Progresse à ton rythme.",
+    blockLabel: "Bloc",
+    openMode: "Commencer",
+    progressLabel: "Ateliers complétés",
+    sessionsTarget: "2 ateliers recommandés par mode",
+    submit: "Obtenir le feedback",
+    submitting: "Analyse en cours…",
+    errorGeneric:
+      "Impossible d'obtenir un feedback pour le moment. Réessaie dans un instant.",
+    errorOffline: "Connexion indisponible. Vérifie ton réseau.",
+    errorApiKey:
+      "Le coach IA n'est pas configuré sur ce serveur. Contacte ton formateur.",
+    qualityMeter: "Niveau « prêt à publier »",
+    exportSprint: "Exporter le kit sprint",
+    toolRouterTitle: "Outils recommandés pour ce bloc",
+    pasteBackTitle: "Coller le résultat de ton outil",
+  },
+  en: {
+    productTitle: "Ircom",
+    productSubtitle: "AI Studio — Management & Communication",
+    navDashboard: "Journey",
+    navCoach: "Coach",
+    navExercise: "Workshop",
+    navSprint: "Sprint",
+    languageLabel: "Language",
+    journeyTitle: "Training journey — 12 hours",
+    journeySubtitle:
+      "Four hands-on blocks: prompting, visuals, short format, agency sprint. Learn at your pace.",
+    blockLabel: "Block",
+    openMode: "Start",
+    progressLabel: "Workshops completed",
+    sessionsTarget: "2 workshops recommended per mode",
+    submit: "Get feedback",
+    submitting: "Analyzing…",
+    errorGeneric: "We could not get feedback right now. Please try again shortly.",
+    errorOffline: "You appear to be offline. Check your connection.",
+    errorApiKey:
+      "The AI coach is not configured on this server. Contact your instructor.",
+    qualityMeter: "Publish-ready level",
+    exportSprint: "Export sprint kit",
+    toolRouterTitle: "Recommended tools for this block",
+    pasteBackTitle: "Paste output from your tool",
+  },
+};
+
+export function t(language: SupportedLanguage, key: MessageKey): string {
+  return messages[language][key];
+}

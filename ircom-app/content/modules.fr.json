@@ -1,31 +1,120 @@
 {
-  "programTitle": "Formation IA Generative Appliquee IRCOM",
-  "centralGoal": "Transformer l'IA en assistant de production performant et critique pour la communication strategique.",
+  "programTitle": "Formation IA Générative Appliquée IRCOM",
+  "centralGoal": "Transformer l'IA en assistant de production performant et critique pour la communication stratégique.",
   "evaluationCriteria": [
-    "Pertinence strategique du contenu produit",
-    "Maitrise des workflows multi-outils",
-    "Esprit critique sur les limites de l'IA"
+    "Pertinence stratégique du contenu produit (publiable par une marque ?)",
+    "Maîtrise des workflows multi-outils",
+    "Esprit critique lors de la restitution"
+  ],
+  "guardrails": [
+    "L'IA est un assistant, pas la source finale des idées",
+    "Éviter le style IA générique et les formulations creuses",
+    "Toujours justifier les choix stratégiques"
+  ],
+  "blocks": [
+    {
+      "id": 1,
+      "title": "Fondations du prompt & copy stratégique",
+      "subtitle": "3 h — De la requête Google au brief d'agence",
+      "mode": "coach",
+      "href": "/coach",
+      "accentColor": "#3B74F7",
+      "recommendedTools": ["claude", "gemini", "chatgpt"],
+      "objectives": [
+        "Structurer un brief : Rôle, Contexte, Objectif, Contraintes, Format",
+        "Définir ton éditorial et charte",
+        "Transformer un communiqué en posts LinkedIn/Instagram"
+      ],
+      "workshopPrompts": [
+        "Transforme ce communiqué en fil LinkedIn percutant (3 posts).",
+        "Réécris ce brouillon en supprimant le jargon IA."
+      ],
+      "sampleBrief": "Client corporate lançant une offre mobilité durable pour actifs urbains."
+    },
+    {
+      "id": 2,
+      "title": "Direction artistique & production visuelle",
+      "subtitle": "3 h — Penser comme un directeur artistique",
+      "mode": "exercise",
+      "href": "/exercise?tab=visual",
+      "accentColor": "#F05872",
+      "recommendedTools": ["firefly", "gemini"],
+      "objectives": [
+        "Décrire styles, angles, lumières, palettes dans les prompts",
+        "Produire des visuels de campagne respectant la marque",
+        "Aborder limites juridiques et éthiques des images IA"
+      ],
+      "workshopPrompts": [
+        "Crée les visuels clés du carrousel pour la campagne du bloc 1.",
+        "Critique ce visuel : cohérence marque et clichés IA."
+      ],
+      "sampleBrief": "Bannières et carrousel pour la campagne LinkedIn."
+    },
+    {
+      "id": 3,
+      "title": "Formats animés & déclinaison",
+      "subtitle": "3 h — Scripts Reels, TikTok, Shorts",
+      "mode": "exercise",
+      "href": "/exercise?tab=script",
+      "accentColor": "#FEBA31",
+      "recommendedTools": ["gemini", "claude"],
+      "objectives": [
+        "Structurer un script 30 s : accroche, corps, CTA",
+        "Décliner un article long en script vidéo + infographie"
+      ],
+      "workshopPrompts": [
+        "Transforme cet article de 1000 mots en script dynamique 30 s.",
+        "Storyboard de trois plans pour l'accroche."
+      ],
+      "sampleBrief": "Script Reel 30 s pour le lancement mobilité."
+    },
+    {
+      "id": 4,
+      "title": "Sprint agence & Grand Oral",
+      "subtitle": "3 h — Rush + restitution critique",
+      "mode": "sprint",
+      "href": "/sprint",
+      "accentColor": "#071554",
+      "recommendedTools": ["claude", "firefly", "gemini"],
+      "objectives": [
+        "Déployer un écosystème de contenus sous pression",
+        "Justifier outils et finition humaine",
+        "Présenter avec esprit critique (pas la magie IA)"
+      ],
+      "workshopPrompts": [
+        "Brief client : gestion de crise après rappel produit.",
+        "Brief client : promotion d'un événement corporate culturel."
+      ],
+      "sampleBrief": "Annonceur veut un kit de lancement : posts, visuels, script vidéo 30 s en 2 h."
+    }
   ],
   "modules": {
     "coach": {
       "title": "Coach interactif",
-      "focus": "Bloc 1 : Prompt metier et copywriting strategique",
-      "expectedDeliverable": "Message social media clair avec contexte, ton, contraintes et format"
+      "focus": "Bloc 1 : Prompt métier et copywriting stratégique",
+      "expectedDeliverable": "Message social media clair avec contexte, ton, contraintes et format",
+      "interactionScripts": {
+        "1": "Diagnostiquer le brief : rôle manquant, contraintes faibles ou objectif flou.",
+        "2": "Proposer un brief d'agence révisé et un exemple de post amélioré."
+      }
     },
     "exercise": {
-      "title": "Exercice pratique",
-      "focus": "Bloc 2-3 : Direction artistique et declinaison en format court",
-      "expectedDeliverable": "Proposition revisee apres critique IA et amelioration humaine"
+      "title": "Atelier pratique",
+      "focus": "Blocs 2-3 : Direction artistique et format court",
+      "expectedDeliverable": "Proposition révisée après critique IA et amélioration humaine",
+      "interactionScripts": {
+        "1": "Critiquer le livrable : cohérence stratégique, clichés IA, cohérence visuelle/script.",
+        "2": "Guider une piste de révision concrète et checklist « prêt à publier »."
+      }
     },
     "sprint": {
       "title": "Simulation sprint agence",
       "focus": "Bloc 4 : Brief annonceur, production multi-formats, restitution critique",
-      "expectedDeliverable": "Mini-kit de campagne avec texte, visuel et script video court"
+      "expectedDeliverable": "Mini-kit de campagne avec texte, concept visuel et script vidéo court",
+      "interactionScripts": {
+        "1": "Émettre une mission annonceur réaliste avec checklist livrables et cadre rush 2 h.",
+        "2": "Mener la critique Grand Oral : cohérence stratégique, finition humaine, choix d'outils."
+      }
     }
-  },
-  "guardrails": [
-    "L'IA est un assistant, pas la source finale des idees",
-    "Eviter le style IA generique et les formulations creuses",
-    "Toujours justifier les choix strategiques"
-  ]
+  }
 }

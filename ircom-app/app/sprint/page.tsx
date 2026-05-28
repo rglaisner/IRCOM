@@ -1,40 +1,25 @@
 "use client";
 
 import { AppShell } from "@/components/app-shell";
-import { ModeInteraction } from "@/components/mode-interaction";
+import { LangSync } from "@/components/lang-sync";
+import { SprintMode } from "@/components/modes/sprint-mode";
 import { useTeacherState } from "@/components/teacher-app";
 
 export default function SprintPage() {
-  const {
-    language,
-    progress,
-    registerInteraction,
-    getHistory,
-    appendHistory,
-    updateLanguage,
-  } = useTeacherState();
+  const state = useTeacherState();
 
   return (
-    <AppShell language={language} onLanguageChange={updateLanguage}>
-      <ModeInteraction
-        mode="sprint"
-        language={language}
-        progress={progress}
-        registerInteraction={registerInteraction}
-        getHistory={getHistory}
-        appendHistory={appendHistory}
-        title={language === "fr" ? "Mode Sprint Agence" : "Agency Sprint Mode"}
-        description={
-          language === "fr"
-            ? "Simule un brief annonceur et produis un mini-kit multi-formats."
-            : "Simulate an advertiser brief and produce a multi-format mini campaign."
-        }
-        placeholder={
-          language === "fr"
-            ? "Exemple: Brief client pour lancement d'evenement corporate..."
-            : "Example: Client brief for a corporate event launch..."
-        }
-      />
-    </AppShell>
+    <>
+      <LangSync language={state.language} />
+      <AppShell language={state.language} onLanguageChange={state.updateLanguage}>
+        <SprintMode
+          language={state.language}
+          progress={state.progress}
+          registerInteraction={state.registerInteraction}
+          getHistory={state.getHistory}
+          appendHistory={state.appendHistory}
+        />
+      </AppShell>
+    </>
   );
 }

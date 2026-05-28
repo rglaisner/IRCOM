@@ -1,11 +1,22 @@
-# IRCOM Gemini Teacher MVP
+# Ircom — Studio IA (Management & Communication)
 
-Interactive bilingual (FR/EN) teaching app for IRCOM students, powered by Gemini.
+Consumer-grade bilingual (FR/EN) learning studio for IRCOM students. Visual identity aligned with [ircom.fr](https://www.ircom.fr/).
 
-The app maps directly to the training baseline and provides 3 lightweight modes:
-- `coach`: guided prompt and copywriting support
-- `exercise`: submission + critique + revision loop
-- `sprint`: scenario-based agency simulation
+## Modes (4 formation blocks)
+
+| Block | Route | Focus |
+|-------|--------|--------|
+| 1 | `/coach` | Agency brief & strategic copy |
+| 2–3 | `/exercise` | Art direction + short-format (tabs) |
+| 4 | `/sprint` | Agency rush, deliverables, Grand Oral |
+
+## Capabilities
+
+- **Gemini** multi-agent pipeline (brief coach, copy critic, art director, sprint facilitator, oral examiner)
+- **Multi-tool studio**: recommended tools (Claude, Firefly, Gemini) with guided links + optional API keys
+- Multimodal exercise (image upload for visual critique)
+- Sprint timer, export kit (markdown), publish-ready quality meter
+- Brand tokens: Poppins, navy `#071554`, MCS blue `#3B74F7` — see `docs/brand-alignment.md`
 
 ## Pedagogical baseline
 
@@ -61,7 +72,9 @@ The GitHub repo root is not the Next.js app. In Vercel project settings, set **R
 | Variable | Required | Notes |
 |----------|----------|--------|
 | `GEMINI_API_KEY` | Yes (for live AI) | Server-only; never commit. Without it, `/api/teacher` returns demo fallback copy. |
-| `GEMINI_MODEL` | No | Defaults to `gemini-3-flash-preview` (see `.env.example`). |
+| `GEMINI_MODEL` | No | Defaults to `gemini-2.0-flash` (see `.env.example`). |
+| `ANTHROPIC_API_KEY` | No | Optional in-app Claude copy pass (`/api/tools/claude`). |
+| `ADOBE_FIREFLY_API_KEY` | No | Reserved for future Firefly integration; guided link always available. |
 
 Apply variables to **Production** and **Preview** for consistent PR previews.
 

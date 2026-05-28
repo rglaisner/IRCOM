@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { AppShell } from "@/components/app-shell";
+import { useEffect, useState } from "react";
 import { createDefaultProgress, studentProgressStorageKey } from "@/lib/teacher/progress";
 import type {
   StudentProgress,
@@ -27,26 +26,28 @@ function getSafeJson<T>(value: string | null, fallbackValue: T): T {
 }
 
 export function useTeacherState() {
-  const [language, setLanguage] = useState<SupportedLanguage>(() => {
-    if (typeof window === "undefined") {
-      return "fr";
-    }
+  const [language, setLanguage] = useState<SupportedLanguage>("fr");
+  const [progress, setProgress] = useState<StudentProgress>(createDefaultProgress);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-    const persistedLanguage = window.localStorage.getItem(languageStorageKey);
-    return persistedLanguage === "fr" || persistedLanguage === "en"
-      ? persistedLanguage
-      : "fr";
-  });
-  const [progress, setProgress] = useState<StudentProgress>(() => {
-    if (typeof window === "undefined") {
-      return createDefaultProgress();
-    }
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const persistedLanguage = window.localStorage.getItem(languageStorageKey);
+      if (persistedLanguage === "fr" || persistedLanguage === "en") {
+        setLanguage(persistedLanguage);
+      }
 
-    return getSafeJson<StudentProgress>(
-      window.localStorage.getItem(studentProgressStorageKey),
-      createDefaultProgress(),
-    );
-  });
+      setProgress(
+        getSafeJson<StudentProgress>(
+          window.localStorage.getItem(studentProgressStorageKey),
+          createDefaultProgress(),
+        ),
+      );
+      setIsHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const updateLanguage = (nextLanguage: SupportedLanguage) => {
     setLanguage(nextLanguage);
@@ -97,23 +98,10 @@ export function useTeacherState() {
   return {
     language,
     progress,
+    isHydrated,
     updateLanguage,
     registerInteraction,
     getHistory,
     appendHistory,
   };
-}
-
-export function TeacherPageLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const teacherState = useTeacherState();
-
-  return (
-    <AppShell language={teacherState.language} onLanguageChange={teacherState.updateLanguage}>
-      {children}
-    </AppShell>
-  );
 }

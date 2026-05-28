@@ -1,6 +1,6 @@
 # Vibe Coder Agent System
 
-This directory defines a six-agent operating model for incremental, low-regression development.
+This directory defines an agent operating model for incremental, low-regression development.
 
 ## Agent Directory
 - `planner.md`: request decomposition, pre-flight architecture, and dependency sequencing
@@ -9,6 +9,8 @@ This directory defines a six-agent operating model for incremental, low-regressi
 - `database.md`: schema, migration safety, and query/index performance alignment
 - `security.md`: proactive hardening and risk review before merge
 - `qa.md`: vibe-check tests first, then failure/regression confidence
+- `designer.md`: visual design, IRCOM brand tokens, J1–J4 polish bar (`ircom-app/`)
+- `consumer-ux-gatekeeper.md`: mandatory Ship/Send back gate for user-visible changes
 
 ## Single-Agent Use
 Use one specialist when the change is isolated:
@@ -22,8 +24,9 @@ Use one specialist when the change is isolated:
 Use orchestration for cross-layer work:
 1. Planner creates scoped slices and execution order.
 2. Frontend, Backend, and Database implement their slices.
-3. Security reviews combined change surface.
-4. QA validates critical and failure paths.
+3. For UI/UX: Designer constraints during implementation; **Consumer UX Gatekeeper** Ship/Send back before handoff.
+4. Security reviews combined change surface.
+5. QA validates critical and failure paths (requires Gatekeeper **Ship** or documented human override for user-visible work).
 
 ## Prompt Routing Examples
 

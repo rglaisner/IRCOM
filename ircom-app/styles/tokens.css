@@ -1,0 +1,55 @@
+/**
+ * IRCOM portal pattern (ircom.fr):
+ * - Header bands: navy background + white text
+ * - Content: white background + dark body text (#212529)
+ * Light mode only — no OS dark-mode flip (was causing unreadable navy-on-navy).
+ */
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --ircom-navy: #071554;
+  --ircom-blue: #3b74f7;
+  --ircom-red: #f05872;
+  --ircom-orange: #feba31;
+  --ircom-green: #aecf3a;
+  --ircom-green-text: #2a6b2a;
+
+  /* Surfaces (portal: white content) */
+  --ircom-page: #ffffff;
+  --ircom-surface: #ffffff;
+  --ircom-panel-subtle: #f8f9fa;
+  --ircom-grey: #dee2e6;
+  --ircom-border: #dee2e6;
+
+  /* Text on light backgrounds — WCAG AA+ */
+  --ircom-text: #212529;
+  --ircom-text-heading: #071554;
+  --ircom-text-secondary: #495057;
+  --ircom-text-muted: #5c6370;
+
+  /* Text on navy header */
+  --ircom-text-on-navy: #ffffff;
+  --ircom-text-on-navy-muted: rgba(255, 255, 255, 0.88);
+
+  /* Legacy aliases (prefer semantic names in new code) */
+  --ircom-bg: var(--ircom-page);
+  --ircom-muted: var(--ircom-text-secondary);
+
+  --ircom-radius-sm: 0.375rem;
+  --ircom-radius-md: 0.75rem;
+  --ircom-radius-lg: 1rem;
+  --ircom-radius-pill: 9999px;
+
+  --ircom-space-1: 0.25rem;
+  --ircom-space-2: 0.5rem;
+  --ircom-space-3: 0.75rem;
+  --ircom-space-4: 1rem;
+  --ircom-space-5: 1.25rem;
+  --ircom-space-6: 1.5rem;
+  --ircom-space-8: 2rem;
+
+  --ircom-touch-min: 44px;
+  --ircom-shadow-card: 0 4px 24px rgba(7, 21, 84, 0.08);
+  --ircom-transition: 180ms ease;
+}

@@ -11,6 +11,7 @@ function createMockTeacherResponse(interactionLabel: string) {
         "Reduce generic AI wording",
         "Strengthen audience specificity",
       ],
+      qualityScore: 72,
     },
   };
 }
@@ -30,16 +31,16 @@ test.beforeEach(async ({ page }) => {
 
 test("switches FR/EN and keeps context across modes", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByText("Parcours IRCOM - Assistant Pedagogique")).toBeVisible();
+  await expect(page.getByText("Parcours formation — 12 h")).toBeVisible();
 
   await page.getByTestId("language-select").selectOption("en");
-  await expect(page.getByText("IRCOM Learning Path - Teaching Assistant")).toBeVisible();
+  await expect(page.getByText("Training journey — 12 hours")).toBeVisible();
 
   await page.getByRole("link", { name: "Coach" }).click();
-  await expect(page.getByRole("heading", { name: "Coach Mode" })).toBeVisible();
+  await expect(page.getByText("Block 1 — Brief coach")).toBeVisible();
 
-  await page.getByRole("link", { name: "Dashboard" }).click();
-  await expect(page.getByText("MVP target: complete at least 2 interactions in each mode.")).toBeVisible();
+  await page.getByRole("link", { name: "Journey" }).click();
+  await expect(page.getByText("Four hands-on blocks")).toBeVisible();
 });
 
 test("coach mode supports two contextual interactions", async ({ page }) => {
@@ -48,12 +49,12 @@ test("coach mode supports two contextual interactions", async ({ page }) => {
   await page.getByTestId("coach-input").fill("First coaching request");
   await page.getByTestId("coach-submit").click();
   await expect(page.getByTestId("coach-response")).toBeVisible();
-  await expect(page.getByText("1/2")).toBeVisible();
+  await expect(page.getByText("1 / 2")).toBeVisible();
 
   await page.getByTestId("coach-input").fill("Second coaching request");
   await page.getByTestId("coach-submit").click();
   await expect(page.getByTestId("coach-response")).toContainText("request-2");
-  await expect(page.getByText("2/2")).toBeVisible();
+  await expect(page.getByText("2 / 2")).toBeVisible();
 });
 
 test("exercise mode supports two iterative attempts", async ({ page }) => {
@@ -62,12 +63,12 @@ test("exercise mode supports two iterative attempts", async ({ page }) => {
   await page.getByTestId("exercise-input").fill("Draft campaign attempt one");
   await page.getByTestId("exercise-submit").click();
   await expect(page.getByTestId("exercise-response")).toContainText("request-1");
-  await expect(page.getByText("1/2")).toBeVisible();
+  await expect(page.getByText("1 / 2")).toBeVisible();
 
   await page.getByTestId("exercise-input").fill("Revised campaign attempt two");
   await page.getByTestId("exercise-submit").click();
   await expect(page.getByTestId("exercise-response")).toContainText("request-2");
-  await expect(page.getByText("2/2")).toBeVisible();
+  await expect(page.getByText("2 / 2")).toBeVisible();
 });
 
 test("sprint mode generates two mission interactions", async ({ page }) => {
@@ -76,15 +77,17 @@ test("sprint mode generates two mission interactions", async ({ page }) => {
   await page.getByTestId("sprint-input").fill("Mission request one");
   await page.getByTestId("sprint-submit").click();
   await expect(page.getByTestId("sprint-response")).toContainText("request-1");
-  await expect(page.getByText("1/2")).toBeVisible();
+  await expect(page.getByText("1 / 2")).toBeVisible();
 
   await page.getByTestId("sprint-input").fill("Mission request two");
   await page.getByTestId("sprint-submit").click();
   await expect(page.getByTestId("sprint-response")).toContainText("request-2");
-  await expect(page.getByText("2/2")).toBeVisible();
+  await expect(page.getByText("2 / 2")).toBeVisible();
 });
 
 test("cross-mode persistence tracks six completed interactions", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
   await page.goto("/coach");
   await page.getByTestId("coach-input").fill("Coach one");
   await page.getByTestId("coach-submit").click();
@@ -113,4 +116,12 @@ test("cross-mode persistence tracks six completed interactions", async ({ page }
   await expect(page.getByTestId("coach-progress-card")).toContainText("2 / 2");
   await expect(page.getByTestId("exercise-progress-card")).toContainText("2 / 2");
   await expect(page.getByTestId("sprint-progress-card")).toContainText("2 / 2");
+});
+
+test("mobile viewport has no horizontal scroll on dashboard", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/");
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+  expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
 });
