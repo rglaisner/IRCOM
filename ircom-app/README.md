@@ -50,6 +50,29 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Deploy on Vercel
+
+Production: [https://ircom.vercel.app](https://ircom.vercel.app)
+
+The GitHub repo root is not the Next.js app. In Vercel project settings, set **Root Directory** to `ircom-app` (required). The `ircom` project is linked to `rglaisner/IRCOM` on branch `main`; pushes to `main` trigger production deploys.
+
+### Environment variables (Vercel dashboard)
+
+| Variable | Required | Notes |
+|----------|----------|--------|
+| `GEMINI_API_KEY` | Yes (for live AI) | Server-only; never commit. Without it, `/api/teacher` returns demo fallback copy. |
+| `GEMINI_MODEL` | No | Defaults to `gemini-3-flash-preview` (see `.env.example`). |
+
+Apply variables to **Production** and **Preview** for consistent PR previews.
+
+### Preflight before pushing
+
+```bash
+npm ci
+npm run build
+npm run lint
+```
+
 ## Core routes
 
 - `/` dashboard with per-mode progress
