@@ -1,0 +1,31 @@
+{
+  "programTitle": "IRCOM Applied Generative AI Program",
+  "centralGoal": "Turn AI into a high-quality production assistant with critical human oversight for strategic communication.",
+  "evaluationCriteria": [
+    "Strategic relevance of produced content",
+    "Operational mastery of multi-tool workflows",
+    "Critical thinking about AI limits"
+  ],
+  "modules": {
+    "coach": {
+      "title": "Interactive coach",
+      "focus": "Block 1: Prompt structure and strategic copywriting",
+      "expectedDeliverable": "Clear social media message with context, tone, constraints, and format"
+    },
+    "exercise": {
+      "title": "Practice exercise",
+      "focus": "Blocks 2-3: Visual direction and short-format adaptation",
+      "expectedDeliverable": "Revised proposal after AI critique and human improvement"
+    },
+    "sprint": {
+      "title": "Agency sprint simulation",
+      "focus": "Block 4: Advertiser brief, multi-format production, critical review",
+      "expectedDeliverable": "Mini campaign kit with text, visual concept, and short video script"
+    }
+  },
+  "guardrails": [
+    "AI is an assistant, not the final source of ideas",
+    "Avoid generic AI writing style and empty phrasing",
+    "Always justify strategic choices"
+  ]
+}

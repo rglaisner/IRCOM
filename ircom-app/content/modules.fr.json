@@ -1,0 +1,31 @@
+{
+  "programTitle": "Formation IA Generative Appliquee IRCOM",
+  "centralGoal": "Transformer l'IA en assistant de production performant et critique pour la communication strategique.",
+  "evaluationCriteria": [
+    "Pertinence strategique du contenu produit",
+    "Maitrise des workflows multi-outils",
+    "Esprit critique sur les limites de l'IA"
+  ],
+  "modules": {
+    "coach": {
+      "title": "Coach interactif",
+      "focus": "Bloc 1 : Prompt metier et copywriting strategique",
+      "expectedDeliverable": "Message social media clair avec contexte, ton, contraintes et format"
+    },
+    "exercise": {
+      "title": "Exercice pratique",
+      "focus": "Bloc 2-3 : Direction artistique et declinaison en format court",
+      "expectedDeliverable": "Proposition revisee apres critique IA et amelioration humaine"
+    },
+    "sprint": {
+      "title": "Simulation sprint agence",
+      "focus": "Bloc 4 : Brief annonceur, production multi-formats, restitution critique",
+      "expectedDeliverable": "Mini-kit de campagne avec texte, visuel et script video court"
+    }
+  },
+  "guardrails": [
+    "L'IA est un assistant, pas la source finale des idees",
+    "Eviter le style IA generique et les formulations creuses",
+    "Toujours justifier les choix strategiques"
+  ]
+}
