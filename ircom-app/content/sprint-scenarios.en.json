@@ -1,0 +1,99 @@
+{
+  "scenarios": [
+    {
+      "id": "sprint-a-urban-weave",
+      "letter": "A",
+      "title": "Crisis management — Urban Weave",
+      "inspiration": "American Eagle jeans campaign controversy 2025; American Airlines mitigation strategies.",
+      "situation": "At 8:00 AM, Urban Weave launches \"DNA-Fit\" with AI-generated copy: \"Superior genetics engineered into every thread. Weed out the weak designs in your closet.\" By 10:00 AM, viral hijacking on X/TikTok (eugenics, body shaming). You are the retained crisis agency.",
+      "constraints": [
+        "2 hours for a complete multi-channel response",
+        "No deletion without detailed explanation (cover-up risk)",
+        "Absolute, empathetic apologies—no defensive legal or AI phrasing"
+      ],
+      "deliverables": [
+        "Immediate holding statement (social)",
+        "Global internal memo",
+        "Instagram apology graphic (Firefly + InDesign)",
+        "45s CMO apology mockup (ElevenLabs + Synthesia)"
+      ],
+      "critiqueFocus": "Apology prompt structure: no defensive passive voice; authentic avatar emotion.",
+      "briefMarkdown": "## Urban Weave — DNA-Fit crisis\n\n**Context**: automated AI campaign, offensive viral phrase.\n\n**Your role**: external crisis communication agency.\n\n**Deadline**: 2h rush.\n\n**Deliverables**: holding statement, internal memo, apology visual, 45s CMO video.\n\n**Tone**: absolute empathy, accountability, zero \"sorry if offended.\"",
+      "narrationScript": "Sprint Scenario A. Urban Weave is in viral crisis this morning. You have two hours. I'll present the situation, CEO constraints, and four expected deliverables. Then you produce with your tools. Grand Oral will focus on your apology prompt and video emotion.",
+      "deliverableChecklist": [
+        "Social holding statement",
+        "Employee internal memo",
+        "Typographic apology visual (Firefly)",
+        "45s CMO video script + mockup"
+      ],
+      "interactionScripts": {
+        "1": "Issue Urban Weave mission with 2h rush checklist and tone constraints.",
+        "2": "Grand Oral: apology prompt, legal risks, text-image-video coherence."
+      },
+      "recommendedTools": ["claude", "firefly", "gemini"]
+    },
+    {
+      "id": "sprint-b-lumina",
+      "letter": "B",
+      "title": "Greenwashing — Lumina Tech",
+      "inspiration": "Target identity crisis; Campbell's ESG backlash controversies.",
+      "situation": "Lumina Tech campaigned on a \"100% carbon neutral\" flagship phone. Investigative report exposes toxic runoff from its Southeast Asian manufacturer. Boycott from activists + shareholder pressure.",
+      "constraints": [
+        "Pivot to radical transparency, not pure denial",
+        "Remove ultra-polished \"carbon neutral\" visuals",
+        "EU AI Act Article 50 on all new synthetic assets"
+      ],
+      "deliverables": [
+        "Customer service FAQ (prompt with bans tags)",
+        "3 Firefly transparency banners",
+        "30s infographic script from audit PDF (Knowlify/Claude)"
+      ],
+      "critiqueFocus": "Firefly vs Midjourney choice; no hallucinated environmental promises.",
+      "briefMarkdown": "## Lumina Tech — Greenwashing pivot\n\n**Context**: contested carbon campaign, toxic manufacturing report.\n\n**Stake**: activists + shareholders.\n\n**Deliverables**: customer FAQ, transparency banners, 30s investor LinkedIn script.\n\n**Prompt bans**: delve, intricate, misunderstanding—absolute accountability tone.",
+      "narrationScript": "Sprint Scenario B. Lumina must pivot under media and legal pressure. EU AI Act compliance mandatory on new visuals. I'll detail deliverables and the Midjourney trap. Two hours for a credible kit.",
+      "deliverableChecklist": [
+        "Complete customer FAQ",
+        "3 Firefly \"transparency\" banners",
+        "30s LinkedIn infographic script",
+        "AI Act compliance note"
+      ],
+      "interactionScripts": {
+        "1": "Lumina mission: transparency pivot, checklist, XML semantic bans.",
+        "2": "Grand Oral: IP compliance, non-hallucinated promises, narrative coherence."
+      },
+      "recommendedTools": ["claude", "firefly", "gemini"]
+    },
+    {
+      "id": "sprint-c-finvault",
+      "letter": "C",
+      "title": "Friday news dump — FinVault",
+      "inspiration": "OpenAI 2023 leadership transition; weekend press release failures.",
+      "situation": "Friday 4:30 PM: FinVault's board ousts the charismatic founder. Sterile 3-sentence release. Rumors of bankruptcy, SEC raids, data breaches trend on LinkedIn/X. Engineers threaten mass resignation. Interim CEO unavailable to film.",
+      "constraints": [
+        "Saturday morning—markets open Monday",
+        "No CEO shoot: authorized AI voiceover + b-roll",
+        "Stability, continuity, gratitude toward departing founder"
+      ],
+      "deliverables": [
+        "Enterprise client email + engineer Slack + interim CEO LinkedIn post",
+        "Q3 product roadmap (Illustrator vectors)",
+        "45s direct address video (Runway + ElevenLabs + CapCut)"
+      ],
+      "critiqueFocus": "Narrative cohesion across text-image-video; strip typical AI crisis hyperbole.",
+      "briefMarkdown": "## FinVault — Weekend stabilization\n\n**Context**: founder ouster, viral rumors, failed Friday news dump.\n\n**Constraint**: interim CEO won't film—campus b-roll + voiceover.\n\n**Deliverables**: 3 targeted texts, Q3 visual roadmap, 45s reassurance video.\n\n**Tone**: unwavering, professional, no catastrophe hyperbole.",
+      "narrationScript": "Sprint Scenario C. FinVault is turbulent this weekend. Stabilize before Monday market open. No on-camera CEO—voiceover and b-roll workflow. I'll present three distinct texts and the reassurance video.",
+      "deliverableChecklist": [
+        "Enterprise client email",
+        "Engineer Slack message",
+        "Interim CEO LinkedIn post",
+        "Q3 visual roadmap",
+        "45s direct address video"
+      ],
+      "interactionScripts": {
+        "1": "FinVault mission: weekend rush, stability tone, no CEO filming.",
+        "2": "Grand Oral: multi-channel cohesion, strip AI hyperbole, psychological viability."
+      },
+      "recommendedTools": ["claude", "gemini", "firefly"]
+    }
+  ]
+}

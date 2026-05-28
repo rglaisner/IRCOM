@@ -1,20 +1,24 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { VoiceSessionPanel } from "@/components/atelier/voice-session-panel";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { MarkdownContent } from "@/components/ui/markdown-content";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { TeacherFeedback } from "@/components/studio/teacher-feedback";
 import { ToolRouter } from "@/components/studio/tool-router";
 import { t } from "@/lib/copy/ui-messages";
 import { useTeacherApi } from "@/lib/hooks/use-teacher-api";
-import { getCurriculum } from "@/lib/teacher/content";
+import { getSprintContent, getSprintScenario } from "@/lib/teacher/sprint-content";
 import { getInteractionCount } from "@/lib/teacher/progress";
 import type {
   StudentProgress,
   SupportedLanguage,
   TeacherMode,
+  TeacherRequestMessage,
   TeacherResponseOutput,
 } from "@/lib/teacher/types";
 
@@ -24,7 +28,7 @@ interface SprintModeProps {
   language: SupportedLanguage;
   progress: StudentProgress;
   registerInteraction: (mode: TeacherMode) => void;
-  getHistory: (mode: TeacherMode) => import("@/lib/teacher/types").TeacherRequestMessage[];
+  getHistory: (mode: TeacherMode) => TeacherRequestMessage[];
   appendHistory: (
     mode: TeacherMode,
     studentInput: string,
@@ -40,13 +44,22 @@ function formatTime(totalSeconds: number): string {
 }
 
 export function SprintMode(props: Readonly<SprintModeProps>) {
+  const searchParams = useSearchParams();
+  const sprintContent = getSprintContent(props.language);
+  const initialScenario = searchParams.get("scenario");
+  const [selectedScenarioId, setSelectedScenarioId] = useState(
+    initialScenario && sprintContent.scenarios.some((s) => s.id === initialScenario)
+      ? initialScenario
+      : sprintContent.scenarios[0].id,
+  );
   const [draft, setDraft] = useState("");
   const [response, setResponse] = useState<TeacherResponseOutput | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(RUSH_SECONDS);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [chatHistory, setChatHistory] = useState<TeacherRequestMessage[]>([]);
   const { submit, isLoading, errorMessage } = useTeacherApi(props.language);
   const completed = getInteractionCount(props.progress, "sprint");
-  const sampleBrief = getCurriculum(props.language).blocks.find((b) => b.id === 4)?.sampleBrief;
+  const scenario = getSprintScenario(props.language, selectedScenarioId);
 
   useEffect(() => {
     if (!timerRunning || secondsLeft <= 0) {
@@ -61,16 +74,23 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
   }, [timerRunning, secondsLeft]);
 
   const handleSubmit = async () => {
-    if (draft.trim().length === 0) {
+    if (!scenario || draft.trim().length === 0) {
       return;
     }
+
+    const prefix =
+      props.language === "fr"
+        ? `Scénario ${scenario.letter} — ${scenario.title}\n\nKit de campagne :\n`
+        : `Scenario ${scenario.letter} — ${scenario.title}\n\nCampaign kit:\n`;
 
     const result = await submit({
       mode: "sprint",
       language: props.language,
-      studentInput: draft.trim(),
+      studentInput: `${prefix}${draft.trim()}`,
       interactionNumber: completed + 1,
       history: props.getHistory("sprint"),
+      scenarioId: scenario.id,
+      blocId: 4,
     });
 
     if (result) {
@@ -81,12 +101,14 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
   };
 
   const exportKit = () => {
-    if (!response) {
+    if (!response || !scenario) {
       return;
     }
 
     const lines = [
       `# ${response.title}`,
+      "",
+      `## ${scenario.title}`,
       "",
       response.feedback,
       "",
@@ -105,10 +127,14 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = "ircom-sprint-kit.md";
+    anchor.download = `ircom-sprint-${scenario.letter}.md`;
     anchor.click();
     URL.revokeObjectURL(url);
   };
+
+  if (!scenario) {
+    return null;
+  }
 
   return (
     <Card accentColor="#071554" className="space-y-6">
@@ -116,10 +142,31 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
         title={props.language === "fr" ? "Bloc 4 — Sprint agence" : "Block 4 — Agency sprint"}
         description={
           props.language === "fr"
-            ? "Rush 2 h : texte, visuel, script 30 s — puis Grand Oral."
-            : "2h rush: copy, visual, 30s script — then Grand Oral."
+            ? "Rush 2 h : choisissez un scénario, produisez, puis Grand Oral."
+            : "2h rush: pick a scenario, produce, then Grand Oral."
         }
       />
+
+      <div className="flex flex-wrap gap-2" data-testid="sprint-scenario-picker">
+        {sprintContent.scenarios.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => {
+              setSelectedScenarioId(item.id);
+              setResponse(null);
+            }}
+            className={`min-h-[var(--ircom-touch-min)] rounded-[var(--ircom-radius-pill)] px-4 text-sm font-medium ${
+              selectedScenarioId === item.id
+                ? "bg-[var(--ircom-navy)] text-white"
+                : "bg-[var(--ircom-panel-subtle)] text-[var(--ircom-text-heading)]"
+            }`}
+            data-testid={`sprint-scenario-${item.letter}`}
+          >
+            {props.language === "fr" ? `Scénario ${item.letter}` : `Scenario ${item.letter}`}
+          </button>
+        ))}
+      </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--ircom-radius-md)] bg-[var(--ircom-navy)] p-4 text-white">
         <div>
@@ -140,18 +187,33 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
         </Button>
       </div>
 
+      <article className="ircom-panel-subtle rounded-[var(--ircom-radius-md)] p-4" data-testid="sprint-brief">
+        <h3 className="ircom-heading mb-2 text-lg font-semibold">{scenario.title}</h3>
+        <MarkdownContent markdown={scenario.briefMarkdown} />
+        <ul className="ircom-secondary mt-4 list-inside list-disc text-sm">
+          {scenario.deliverableChecklist.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </article>
+
+      <VoiceSessionPanel
+        language={props.language}
+        scenario={scenario}
+        context="sprint"
+        chatHistory={[...props.getHistory("sprint"), ...chatHistory]}
+        onChatReply={(question, answer) => {
+          setChatHistory((prev) => [
+            ...prev,
+            { role: "student", content: question },
+            { role: "teacher", content: answer },
+          ]);
+        }}
+      />
+
       <ProgressBar value={completed} max={2} label={t(props.language, "progressLabel")} />
 
       <ToolRouter language={props.language} blockId={4} />
-
-      {sampleBrief ? (
-        <p className="ircom-panel-subtle ircom-body rounded-[var(--ircom-radius-md)] p-4 text-sm">
-          <span className="ircom-heading font-medium">
-            {props.language === "fr" ? "Exemple de brief : " : "Sample brief: "}
-          </span>
-          {sampleBrief}
-        </p>
-      ) : null}
 
       <textarea
         className="ircom-input min-h-36 w-full rounded-[var(--ircom-radius-md)] p-3 text-sm"
@@ -159,8 +221,8 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
         onChange={(event) => setDraft(event.target.value)}
         placeholder={
           props.language === "fr"
-            ? "Décris ta mission, tes livrables ou colle ton kit de campagne…"
-            : "Describe your mission, deliverables, or paste your campaign kit…"
+            ? "Collez votre kit de campagne (texte, notes visuelles, script vidéo)…"
+            : "Paste your campaign kit (copy, visual notes, video script)…"
         }
         data-testid="sprint-input"
       />

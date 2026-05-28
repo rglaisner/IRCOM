@@ -3,7 +3,9 @@ import {
   agentDisplayNames,
   resolveAgentRoleFromInput,
 } from "@/lib/agents/types";
+import { getAtelierScenario } from "@/lib/teacher/atelier-content";
 import { getCurriculum, getInteractionScript } from "@/lib/teacher/content";
+import { getSprintScenario } from "@/lib/teacher/sprint-content";
 import type { SupportedLanguage, TeacherMode } from "@/lib/teacher/types";
 import type { TeacherRequestInput } from "@/lib/teacher/types";
 
@@ -16,6 +18,37 @@ function getModeInstruction(mode: TeacherMode, language: SupportedLanguage): str
   return modeModule.focus;
 }
 
+function getScenarioContext(payload: TeacherRequestInput): string {
+  if (payload.mode === "atelier" && payload.scenarioId) {
+    const scenario = getAtelierScenario(payload.language, payload.scenarioId);
+    if (!scenario) {
+      return "";
+    }
+    return [
+      `Atelier scenario: ${scenario.title}`,
+      `Situation: ${scenario.situation}`,
+      `Constraints: ${scenario.constraints.join("; ")}`,
+      `Expected deliverables: ${scenario.deliverables.join("; ")}`,
+    ].join("\n");
+  }
+
+  if (payload.mode === "sprint" && payload.scenarioId) {
+    const scenario = getSprintScenario(payload.language, payload.scenarioId);
+    if (!scenario) {
+      return "";
+    }
+    return [
+      `Sprint scenario ${scenario.letter}: ${scenario.title}`,
+      `Situation: ${scenario.situation}`,
+      `Constraints: ${scenario.constraints.join("; ")}`,
+      `Deliverables: ${scenario.deliverables.join("; ")}`,
+      `Critique focus: ${scenario.critiqueFocus}`,
+    ].join("\n");
+  }
+
+  return "";
+}
+
 export function buildTeacherPrompt(payload: TeacherRequestInput): string {
   const curriculum = getCurriculum(payload.language);
   const selectedModule = curriculum.modules[payload.mode];
@@ -25,6 +58,7 @@ export function buildTeacherPrompt(payload: TeacherRequestInput): string {
     payload.language,
     payload.mode,
     payload.interactionNumber,
+    payload.scenarioId,
   );
 
   const historySummary = payload.history
@@ -46,10 +80,12 @@ export function buildTeacherPrompt(payload: TeacherRequestInput): string {
       `Format: ${payload.briefFields.format}`,
     ].join("\n");
 
+  const scenarioContext = getScenarioContext(payload);
+
   const responseShape =
     payload.mode === "sprint"
       ? "Include deliverableChecklist (array), rubricScores {strategic,workflow,critical}, qualityScore 0-100."
-      : payload.mode === "exercise"
+      : payload.mode === "atelier"
         ? "Include visualNotes array when critiquing visuals or scripts."
         : "Include recommendedTool when suggesting next production tool.";
 
@@ -69,9 +105,11 @@ export function buildTeacherPrompt(payload: TeacherRequestInput): string {
     interactionScript
       ? `Interaction script: ${interactionScript}`
       : `Mode instruction: ${getModeInstruction(payload.mode, payload.language)}`,
+    scenarioContext.length > 0 ? scenarioContext : "",
     payload.sourceTool ? `Student used tool: ${payload.sourceTool}` : "",
     briefSection ? `Agency brief fields:\n${briefSection}` : "",
     payload.exerciseTab ? `Exercise tab: ${payload.exerciseTab}` : "",
+    payload.blocId ? `Bloc: ${payload.blocId}` : "",
     historySummary.length > 0 ? `Recent conversation:\n${historySummary}` : "No prior history.",
     `Latest student input:\n${payload.studentInput}`,
   ]

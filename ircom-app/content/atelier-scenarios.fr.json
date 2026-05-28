@@ -1,0 +1,126 @@
+{
+  "scenarios": [
+    {
+      "id": "b1-mobilite-launch",
+      "blocId": 1,
+      "title": "Lancement mobilité durable",
+      "summary": "Transformer un communiqué corporate en fil LinkedIn structuré avec brief RACE.",
+      "situation": "Votre client « Horizon Mobilité » lance une offre de mobilité durable pour actifs urbains. Vous recevez un communiqué de presse dense (1500 mots) et devez produire un fil LinkedIn en 3 posts pour rassurer des cadres pressés sur le ROI et le temps gagné.",
+      "constraints": [
+        "Brief RACE complet obligatoire avant génération",
+        "Aucun emoji, ton sobre et confiant",
+        "Interdire : incontournable, catalyseur, à l'ère de, véritable levier"
+      ],
+      "deliverables": [
+        "Brief d'agence structuré (Rôle, Contexte, Objectif, Contraintes, Format)",
+        "Fil LinkedIn en 3 posts prêts à publier",
+        "Liste des tics IA supprimés avec justification"
+      ],
+      "narrationScript": "Bienvenue dans cet atelier Bloc 1. Vous êtes chargé de communication pour Horizon Mobilité. Le PDG veut un fil LinkedIn en 3 posts d'ici ce soir, à partir d'un communiqué trop long. Votre mission : construire un brief d'agence RACE, puis commander l'IA sans laisser le jargon générique passer. Je vais vous guider sur les enjeux du client et les pièges du jargon IA. Interrompez-moi à tout moment pour poser une question.",
+      "linkedCourseSectionIds": ["philosophy", "lessons", "illustrations"],
+      "recommendedTools": ["claude", "gemini", "chatgpt"]
+    },
+    {
+      "id": "b1-jargon-audit",
+      "blocId": 1,
+      "title": "Audit anti-jargon IA",
+      "summary": "Réécrire un brouillon généré par IA en supprimant les formulations creuses.",
+      "situation": "Votre manager vous envoie un brouillon de mémo interne généré par ChatGPT sur la transformation digitale. Le ton est reconnaissable comme « IA » et doit être réécrit pour une direction exigeante avant diffusion à 2000 collaborateurs.",
+      "constraints": [
+        "Conserver les faits, changer uniquement style et structure",
+        "Utiliser des balises bans/prefer explicites dans le prompt",
+        "Maximum 400 mots en sortie"
+      ],
+      "deliverables": [
+        "Prompt de réécriture avec balises XML bans/prefer",
+        "Version réécrite du mémo",
+        "Tableau : formulation IA → formulation humaine (5 exemples)"
+      ],
+      "narrationScript": "Scénario d'audit éditorial. Vous héritez d'un mémo interne truffé de jargon IA. Votre crédibilité professionnelle dépend de la réécriture. Nous allons identifier les tics, construire un prompt négatif efficace, et produire une version publiable. Posez vos questions si un passage vous semble encore trop « machine ».",
+      "linkedCourseSectionIds": ["illustrations", "lessons"],
+      "recommendedTools": ["claude", "gemini"]
+    },
+    {
+      "id": "b2-carousel-campaign",
+      "blocId": 2,
+      "title": "Carrousel LinkedIn — direction artistique",
+      "summary": "Créer et critiquer les visuels clés d'une campagne corporate.",
+      "situation": "Suite au lancement mobilité du Bloc 1, vous devez produire un carrousel LinkedIn de 5 slides : charte navy/blanc, photos authentiques (pas de stock plastique), message cohérent avec le fil copy.",
+      "constraints": [
+        "Prompts visuels avec angle, lumière et palette explicites",
+        "Firefly recommandé pour assets publics",
+        "Pas de visages deepfake sans disclosure EU AI Act"
+      ],
+      "deliverables": [
+        "3 prompts Firefly documentés (angle, lumière, palette)",
+        "Export des visuels ou captures",
+        "Auto-critique : cohérence marque + clichés IA"
+      ],
+      "narrationScript": "Atelier direction artistique. Vous passez du texte à l'image pour le même client Horizon Mobilité. Je détaille la situation, les contraintes de marque et les risques juridiques Firefly vs Midjourney. Vous expérimenterez ensuite avec les outils recommandés. Levez la main si vous voulez clarifier un prompt visuel.",
+      "linkedCourseSectionIds": ["philosophy", "lessons"],
+      "recommendedTools": ["firefly", "gemini"],
+      "allowsImageUpload": true
+    },
+    {
+      "id": "b2-compliance-visual",
+      "blocId": 2,
+      "title": "Conformité visuelle EU AI Act",
+      "summary": "Choisir l'outil adapté sous contrainte juridique stricte.",
+      "situation": "Une marque européenne de luxe exige des bannières web générées avec métadonnées de provenance et filigrane. Votre équipe a testé Midjourney — le juridique refuse. Vous devez reproduire l'intention créative dans Firefly.",
+      "constraints": [
+        "Firefly uniquement pour livrables finaux",
+        "Documenter la chaîne de conformité (3 niveaux AI Act)",
+        "Ton visuel sobre, pas d'esthétique « banque d'images IA »"
+      ],
+      "deliverables": [
+        "Note de choix d'outil (1 page)",
+        "2 bannières Firefly avec checklist conformité",
+        "Procédure metadata + disclosure pour le client"
+      ],
+      "narrationScript": "Scénario conformité. Le juridique vient de bloquer Midjourney pour des assets publics. Vous devez livrer sous l'article 50 de l'EU AI Act. Nous parcourons la situation, les trois niveaux de transparence, et votre workflow Firefly. Questions bienvenues sur indemnisation et provenance des données.",
+      "linkedCourseSectionIds": ["illustrations", "lessons"],
+      "recommendedTools": ["firefly"],
+      "allowsImageUpload": true
+    },
+    {
+      "id": "b3-reel-script",
+      "blocId": 3,
+      "title": "Script Reel 30 secondes",
+      "summary": "Décliner un article long en script vertical percutant.",
+      "situation": "L'article de blog Horizon Mobilité (1000 mots) doit devenir un Reel Instagram 30 s : hook agressif, corps rythmé, CTA inscription essai gratuit.",
+      "constraints": [
+        "Hook dans les 3 premières secondes",
+        "Colonnes séparées : dialogue / direction visuelle",
+        "Durée lue à voix haute : 28–32 secondes"
+      ],
+      "deliverables": [
+        "Script 30 s en tableau Markdown",
+        "Storyboard 3 plans pour l'accroche",
+        "Indication outils TTS / B-roll recommandés"
+      ],
+      "narrationScript": "Atelier format court. Même campagne, nouveau format : 30 secondes pour arrêter le scroll. Je présente la structure Hook-Corps-CTA et les outils de la stack vidéo fragmentée. Vous produirez le script puis pourrez le tester avec ElevenLabs ou vos outils habituels.",
+      "linkedCourseSectionIds": ["philosophy", "lessons"],
+      "recommendedTools": ["gemini", "claude"]
+    },
+    {
+      "id": "b3-long-to-short",
+      "blocId": 3,
+      "title": "Du livre blanc à l'infographie animée",
+      "summary": "Orchestrer une déclinaison multi-outils à partir d'un PDF dense.",
+      "situation": "Un livre blanc technique sur la mobilité (12 pages) doit alimenter : un script LinkedIn 45 s pour investisseurs, et une infographie storyboardée pour Knowlify.",
+      "constraints": [
+        "Ne pas halluciner de chiffres absents du PDF",
+        "Ton institutionnel, pas de hyperbole crise",
+        "Workflow documenté en 4 étapes minimum"
+      ],
+      "deliverables": [
+        "Script LinkedIn 45 s",
+        "Outline storyboard 6 scènes",
+        "Schéma du workflow multi-outils (texte)"
+      ],
+      "narrationScript": "Scénario de déclinaison avancée. Vous partez d'un PDF dense et devez livrer deux formats sans perdre le message stratégique. Nous couvrons l'extraction, le script investisseur et le storyboard. Interrompez pour vérifier un fait ou un choix d'outil.",
+      "linkedCourseSectionIds": ["lessons", "illustrations"],
+      "recommendedTools": ["gemini", "claude"]
+    }
+  ]
+}

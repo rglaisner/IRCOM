@@ -1,0 +1,99 @@
+{
+  "scenarios": [
+    {
+      "id": "sprint-a-urban-weave",
+      "letter": "A",
+      "title": "Gestion de crise — Urban Weave",
+      "inspiration": "Controverse campagne jeans American Eagle 2025 ; mitigation American Airlines.",
+      "situation": "À 8h00, Urban Weave lance « DNA-Fit » avec une phrase générée par IA : « Une génétique supérieure conçue dans chaque fil. Éliminez les designs faibles de votre garde-robe. » À 10h00, détournement viral sur X/TikTok (eugénisme, body shaming). Vous êtes l'agence de crise retenue.",
+      "constraints": [
+        "2 heures pour une réponse multicanal complète",
+        "Pas de suppression sans explication détaillée (risque de dissimulation)",
+        "Excuses absolues, empathiques, sans jargon juridique défensif"
+      ],
+      "deliverables": [
+        "Déclaration d'attente immédiate (réseaux sociaux)",
+        "Mémo interne global",
+        "Graphique excuses Instagram (Firefly + InDesign)",
+        "Maquette vidéo excuses CMO 45 s (ElevenLabs + Synthesia)"
+      ],
+      "critiqueFocus": "Structure du prompt d'excuses : pas de voix passive défensive ; émotion authentique de l'avatar.",
+      "briefMarkdown": "## Urban Weave — Crise DNA-Fit\n\n**Contexte** : campagne automatisée IA, phrase offensante virale.\n\n**Votre rôle** : agence de communication de crise externe.\n\n**Délai** : 2 h (rush).\n\n**Livrables** : holding statement, mémo interne, visuel excuses, vidéo CMO 45 s.\n\n**Ton** : empathie absolue, responsabilité, zéro « nous sommes désolés si… ».",
+      "narrationScript": "Sprint Scénario A. Urban Weave est en crise virale ce matin. Vous avez deux heures. Je présente la situation, les contraintes du PDG et les quatre livrables attendus. Ensuite vous produisez avec vos outils. Le Grand Oral portera sur votre prompt d'excuses et l'émotion de la vidéo.",
+      "deliverableChecklist": [
+        "Holding statement réseaux sociaux",
+        "Mémo interne employés",
+        "Visuel excuses typographique (Firefly)",
+        "Script + maquette vidéo CMO 45 s"
+      ],
+      "interactionScripts": {
+        "1": "Émettre la mission Urban Weave avec checklist rush 2 h et rappel des contraintes de ton.",
+        "2": "Grand Oral : prompt d'excuses, risques juridiques, cohérence texte-image-vidéo."
+      },
+      "recommendedTools": ["claude", "firefly", "gemini"]
+    },
+    {
+      "id": "sprint-b-lumina",
+      "letter": "B",
+      "title": "Greenwashing — Lumina Tech",
+      "inspiration": "Crise Target ; controverses Campbell's sur engagements ESG.",
+      "situation": "Lumina Tech a campagné sur un smartphone « 100 % neutre en carbone ». Un rapport d'investigation expose la pollution de son fabricant en Asie du Sud-Est. Boycott écologistes + pression actionnaires.",
+      "constraints": [
+        "Pivot vers transparence radicale, pas déni pur",
+        "Retirer visuels « neutre carbone » ultra-polish",
+        "Conformité article 50 EU AI Act sur tout nouvel asset synthétique"
+      ],
+      "deliverables": [
+        "FAQ service client (prompt avec balises bans)",
+        "3 bannières transparence Firefly",
+        "Script infographie 30 s depuis PDF audit (Knowlify/Claude)"
+      ],
+      "critiqueFocus": "Choix Firefly vs Midjourney ; aucune promesse environnementale hallucinée.",
+      "briefMarkdown": "## Lumina Tech — Pivot greenwashing\n\n**Contexte** : campagne carbone contestée, rapport fabrication toxique.\n\n**Enjeu** : deux fronts (activistes + actionnaires).\n\n**Livrables** : FAQ clients, bannières transparence, script vidéo 30 s investisseurs.\n\n**Interdits prompt** : delve, intricate, malentendu — ton responsabilité absolue.",
+      "narrationScript": "Sprint Scénario B. Lumina Tech doit pivoter sous pression médiatique et juridique. Conformité EU AI Act obligatoire sur les nouveaux visuels. Je détaille les livrables et le piège Midjourney. Vous avez deux heures pour un kit crédible.",
+      "deliverableChecklist": [
+        "FAQ service client complète",
+        "3 bannières Firefly « transparence »",
+        "Script infographie LinkedIn 30 s",
+        "Note conformité AI Act"
+      ],
+      "interactionScripts": {
+        "1": "Mission Lumina : pivot transparence, checklist, interdits sémantiques XML.",
+        "2": "Grand Oral : conformité PI, promesses non hallucinées, cohérence narrative."
+      },
+      "recommendedTools": ["claude", "firefly", "gemini"]
+    },
+    {
+      "id": "sprint-c-finvault",
+      "letter": "C",
+      "title": "Friday news dump — FinVault",
+      "inspiration": "Transition OpenAI 2023 ; échec communiqués week-end.",
+      "situation": "Vendredi 16h30 : le conseil évince le fondateur de FinVault (fintech licorne). Communiqué stérile de 3 phrases. Rumeurs faillite, SEC, fuite données. Ingénieurs menacent démission collective. PDG par intérim indisponible pour filmer.",
+      "constraints": [
+        "Samedi matin — marchés lundi",
+        "Pas de tournage PDG : voix off IA + B-roll autorisé",
+        "Stabilité, continuité, gratitude envers fondateur sortant"
+      ],
+      "deliverables": [
+        "Email clients enterprise + Slack ingénieurs + post LinkedIn PDG intérim",
+        "Feuille de route produit Q3 (vecteurs Illustrator)",
+        "Vidéo adresse directe 45 s (Runway + ElevenLabs + CapCut)"
+      ],
+      "critiqueFocus": "Cohésion narrative texte-image-vidéo ; suppression du drame IA typique des crises.",
+      "briefMarkdown": "## FinVault — Stabilisation week-end\n\n**Contexte** : éviction fondateur, rumeurs viral, Friday news dump raté.\n\n**Contrainte** : PDG intérim ne filme pas — B-roll campus + voix off.\n\n**Livrables** : 3 textes ciblés, roadmap visuelle Q3, vidéo 45 s réassurance.\n\n**Ton** : inébranlable, professionnel, sans hyperbole catastrophe.",
+      "narrationScript": "Sprint Scénario C. FinVault est en turbulence ce week-end. Vous stabilisez avant l'ouverture des marchés lundi. Pas de face caméra — workflow voix off et B-roll. Je présente les trois textes distincts et la vidéo de réassurance.",
+      "deliverableChecklist": [
+        "Email clients enterprise",
+        "Message Slack ingénieurs",
+        "Post LinkedIn PDG intérim",
+        "Roadmap visuelle Q3",
+        "Vidéo adresse directe 45 s"
+      ],
+      "interactionScripts": {
+        "1": "Mission FinVault : rush week-end, tonalité stabilité, pas de tournage PDG.",
+        "2": "Grand Oral : cohésion multicanal, suppression hyperbole IA, viabilité psychologique."
+      },
+      "recommendedTools": ["claude", "gemini", "firefly"]
+    }
+  ]
+}

@@ -15,9 +15,11 @@
     {
       "id": 1,
       "title": "Fondations du prompt & copy stratégique",
-      "subtitle": "3 h — De la requête Google au brief d'agence",
-      "mode": "coach",
-      "href": "/coach",
+      "subtitle": "3 h — Cours écrit + atelier pratique",
+      "mode": "course",
+      "href": "/coach?bloc=1",
+      "courseHref": "/coach?bloc=1",
+      "atelierHref": "/exercise?bloc=1",
       "accentColor": "#3B74F7",
       "recommendedTools": ["claude", "gemini", "chatgpt"],
       "objectives": [
@@ -34,9 +36,11 @@
     {
       "id": 2,
       "title": "Direction artistique & production visuelle",
-      "subtitle": "3 h — Penser comme un directeur artistique",
-      "mode": "exercise",
-      "href": "/exercise?tab=visual",
+      "subtitle": "3 h — Cours écrit + atelier pratique",
+      "mode": "course",
+      "href": "/coach?bloc=2",
+      "courseHref": "/coach?bloc=2",
+      "atelierHref": "/exercise?bloc=2",
       "accentColor": "#F05872",
       "recommendedTools": ["firefly", "gemini"],
       "objectives": [
@@ -53,9 +57,11 @@
     {
       "id": 3,
       "title": "Formats animés & déclinaison",
-      "subtitle": "3 h — Scripts Reels, TikTok, Shorts",
-      "mode": "exercise",
-      "href": "/exercise?tab=script",
+      "subtitle": "3 h — Cours écrit + atelier pratique",
+      "mode": "course",
+      "href": "/coach?bloc=3",
+      "courseHref": "/coach?bloc=3",
+      "atelierHref": "/exercise?bloc=3",
       "accentColor": "#FEBA31",
       "recommendedTools": ["gemini", "claude"],
       "objectives": [
@@ -82,25 +88,22 @@
         "Présenter avec esprit critique (pas la magie IA)"
       ],
       "workshopPrompts": [
-        "Brief client : gestion de crise après rappel produit.",
-        "Brief client : promotion d'un événement corporate culturel."
+        "Scénario A : crise Urban Weave.",
+        "Scénario B : pivot Lumina Tech.",
+        "Scénario C : stabilisation FinVault."
       ],
-      "sampleBrief": "Annonceur veut un kit de lancement : posts, visuels, script vidéo 30 s en 2 h."
+      "sampleBrief": "Choisir un scénario de crise et livrer kit multi-formats en 2 h."
     }
   ],
   "modules": {
-    "coach": {
-      "title": "Coach interactif",
-      "focus": "Bloc 1 : Prompt métier et copywriting stratégique",
-      "expectedDeliverable": "Message social media clair avec contexte, ton, contraintes et format",
-      "interactionScripts": {
-        "1": "Diagnostiquer le brief : rôle manquant, contraintes faibles ou objectif flou.",
-        "2": "Proposer un brief d'agence révisé et un exemple de post amélioré."
-      }
+    "course": {
+      "title": "Cours magistral",
+      "focus": "Blocs 1–3 : fondations théoriques et leçons écrites",
+      "expectedDeliverable": "Lecture et compréhension des sections du cours"
     },
-    "exercise": {
+    "atelier": {
       "title": "Atelier pratique",
-      "focus": "Blocs 2-3 : Direction artistique et format court",
+      "focus": "Blocs 1–3 : scénarios vocaux et livrables multi-outils",
       "expectedDeliverable": "Proposition révisée après critique IA et amélioration humaine",
       "interactionScripts": {
         "1": "Critiquer le livrable : cohérence stratégique, clichés IA, cohérence visuelle/script.",

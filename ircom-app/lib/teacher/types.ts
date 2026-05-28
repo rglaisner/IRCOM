@@ -3,9 +3,11 @@ import { z } from "zod";
 export const supportedLanguages = ["fr", "en"] as const;
 export type SupportedLanguage = (typeof supportedLanguages)[number];
 
-export const teacherModes = ["coach", "exercise", "sprint"] as const;
+/** Active product modes (Cours is read-only — no API progress). */
+export const teacherModes = ["course", "atelier", "sprint"] as const;
 export type TeacherMode = (typeof teacherModes)[number];
 
+/** @deprecated Use exerciseTab only for legacy API payloads during migration. */
 export const exerciseTabs = ["visual", "script"] as const;
 export type ExerciseTab = (typeof exerciseTabs)[number];
 
@@ -15,8 +17,8 @@ export interface ModeProgress {
 }
 
 export interface StudentProgress {
-  coach: ModeProgress;
-  exercise: ModeProgress;
+  course: ModeProgress;
+  atelier: ModeProgress;
   sprint: ModeProgress;
 }
 
@@ -59,6 +61,29 @@ export const teacherRequestSchema = z.object({
   imageMimeType: z.string().max(64).optional(),
   exerciseTab: z.enum(exerciseTabs).optional(),
   sourceTool: z.string().max(32).optional(),
+  scenarioId: z.string().max(64).optional(),
+  blocId: z.number().int().min(1).max(4).optional(),
+});
+
+export const atelierNarrateRequestSchema = z.object({
+  language: z.enum(supportedLanguages),
+  scenarioId: z.string().min(1).max(64),
+});
+
+export const atelierChatRequestSchema = z.object({
+  language: z.enum(supportedLanguages),
+  scenarioId: z.string().min(1).max(64),
+  question: z.string().trim().min(1).max(2000),
+  transcript: z.string().max(12000).optional(),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(["student", "teacher"]),
+        content: z.string().trim().min(1).max(2000),
+      }),
+    )
+    .max(12)
+    .optional(),
 });
 
 export const rubricScoresSchema = z.object({
@@ -80,4 +105,6 @@ export const teacherResponseSchema = z.object({
 });
 
 export type TeacherRequestInput = z.infer<typeof teacherRequestSchema>;
+export type AtelierNarrateRequest = z.infer<typeof atelierNarrateRequestSchema>;
+export type AtelierChatRequest = z.infer<typeof atelierChatRequestSchema>;
 export type TeacherResponseOutput = z.infer<typeof teacherResponseSchema>;

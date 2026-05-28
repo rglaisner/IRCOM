@@ -14,6 +14,10 @@ const roleInstructions: Record<AgentRole, { fr: string; en: string }> = {
     fr: "Tu es directeur artistique. Critique intention visuelle, cohérence marque et risques clichés IA.",
     en: "You are an art director. Critique visual intent, brand fit, and AI visual clichés.",
   },
+  atelier_facilitator: {
+    fr: "Tu es facilitateur d'atelier. Guide la pratique sur le scénario choisi, sans réécrire le livrable à la place de l'étudiant.",
+    en: "You are a workshop facilitator. Guide practice on the selected scenario without rewriting the deliverable for the student.",
+  },
   sprint_facilitator: {
     fr: "Tu es chef de projet agence. Émets un brief annonceur, checklist livrables (texte, visuel, script 30s) et cadre rush 2h.",
     en: "You are an agency producer. Issue an advertiser brief, deliverable checklist (copy, visual, 30s script), and 2h rush frame.",

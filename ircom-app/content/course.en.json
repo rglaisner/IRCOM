@@ -1,0 +1,70 @@
+{
+  "blocs": [
+    {
+      "id": 1,
+      "title": "Prompt foundations & strategic copy",
+      "subtitle": "From Google query to agency brief",
+      "sections": [
+        {
+          "id": "philosophy",
+          "title": "Philosophy: the illusion of speed",
+          "markdown": "LLMs generate text very fast, but without rigorous guidance the output stays bland and generic. The core skill is the **Art of the Command**: moving from a \"Google search\" mindset to a complete **agency brief**.\n\nAI has no inherent ideas or strategic vision—value stays in human intellect. Writing with AI is iterative dialogue (Cyborg/Centaur approach): the human supplies the core paragraph; AI helps with structure and format."
+        },
+        {
+          "id": "lessons",
+          "title": "Lessons: RACE and ROCOF frameworks",
+          "markdown": "For professional copy, impose **Role, Objective/Action, Context, Constraints, Format**.\n\n| Component | Purpose |\n| --- | --- |\n| Role | Expert persona to narrow semantic field |\n| Objective | Precise action, unambiguous verbs |\n| Context | Audience, stakes, history |\n| Constraints | Negative prompts, length, tone |\n| Format | Operational output structure |\n\nExample: \"Act as a senior B2B copywriter; draft a 3-part LinkedIn thread on supply chain delays; audience: executives anxious about Q3 margins; no emojis; under 150 words per post; Markdown table with Hook / Body / CTA.\""
+        },
+        {
+          "id": "illustrations",
+          "title": "Illustrations: the AI-ism epidemic",
+          "markdown": "Spot and remove **AI tics**: \"It's not just about…\", overly optimistic closings, lexicon like *delve, intricate, tapestry, leverage, pivotal*.\n\nUse `<bans>` and `<prefer>` tags to force an authentic semantic corridor. Human quality control remains mandatory before publication."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Art direction & visual production",
+      "subtitle": "Think like a creative director",
+      "sections": [
+        {
+          "id": "philosophy",
+          "title": "Philosophy: the non-designer's eye",
+          "markdown": "Directing an image generator requires visual vocabulary: angles (close-up, Dutch angle, drone), lighting (volumetric, golden hour, Rembrandt), focal lengths, palettes. Without it, AI defaults to a generic plastic aesthetic."
+        },
+        {
+          "id": "lessons",
+          "title": "Lessons: DTP and Firefly integration",
+          "markdown": "Integrate AI into professional **DTP** workflows (Photoshop, Illustrator, InDesign). Firefly supports Generative Expand, typography, and vectors in production environments.\n\n**Adobe Firefly**: licensed training data, IP indemnification for enterprise.\n**Midjourney**: superior creative flair but legal risk—internal mood boards only, not final public assets."
+        },
+        {
+          "id": "illustrations",
+          "title": "Illustrations: EU AI Act transparency",
+          "markdown": "By August 2026, Article 50 requires transparency on synthetic content: provenance metadata, robust watermarks, visible labels for deepfakes.\n\nPenalties up to €7.5M or 1.5% global turnover. Marketing workflows must embed compliance at generation time."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Short video & multi-platform adaptation",
+      "subtitle": "Scripts for Reels, TikTok, Shorts",
+      "sections": [
+        {
+          "id": "philosophy",
+          "title": "Philosophy: attention economics",
+          "markdown": "A 30–60s vertical video needs: **Hook** (first 3 seconds), paced **Body**, clear **CTA**. **Declination logic** adapts long-form content (article, whitepaper) into short scripts without losing the strategic core."
+        },
+        {
+          "id": "lessons",
+          "title": "Lessons: fragmented video stack",
+          "markdown": "No single tool covers script, storyboard, voice, b-roll, and edit. Typical workflow:\n\n1. **Script** (Claude/Gemini) with dialogue / visual direction columns\n2. **Storyboard** (LTX Studio, Knowlify)\n3. **TTS** (ElevenLabs) as timing anchor\n4. **B-roll / avatars** (Runway, Kling, HeyGen, Synthesia)\n5. **Assembly** (CapCut, Premiere, n8n)—captions, transitions, 9:16 / 16:9 ratios"
+        },
+        {
+          "id": "illustrations",
+          "title": "Illustrations: production pitfalls",
+          "markdown": "Common failures: character inconsistency across scenes, audio sync issues. Mitigations: reference images (Kling, Luma), or static avatars plus abstract product b-roll."
+        }
+      ]
+    }
+  ]
+}

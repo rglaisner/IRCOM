@@ -15,9 +15,11 @@
     {
       "id": 1,
       "title": "Prompt foundations & strategic copy",
-      "subtitle": "3h — From Google query to agency brief",
-      "mode": "coach",
-      "href": "/coach",
+      "subtitle": "3h — Written course + hands-on workshop",
+      "mode": "course",
+      "href": "/coach?bloc=1",
+      "courseHref": "/coach?bloc=1",
+      "atelierHref": "/exercise?bloc=1",
       "accentColor": "#3B74F7",
       "recommendedTools": ["claude", "gemini", "chatgpt"],
       "objectives": [
@@ -34,9 +36,11 @@
     {
       "id": 2,
       "title": "Art direction & visual production",
-      "subtitle": "3h — Think like a creative director",
-      "mode": "exercise",
-      "href": "/exercise?tab=visual",
+      "subtitle": "3h — Written course + hands-on workshop",
+      "mode": "course",
+      "href": "/coach?bloc=2",
+      "courseHref": "/coach?bloc=2",
+      "atelierHref": "/exercise?bloc=2",
       "accentColor": "#F05872",
       "recommendedTools": ["firefly", "gemini"],
       "objectives": [
@@ -53,9 +57,11 @@
     {
       "id": 3,
       "title": "Short video & declination logic",
-      "subtitle": "3h — Scripts for Reels, TikTok, Shorts",
-      "mode": "exercise",
-      "href": "/exercise?tab=script",
+      "subtitle": "3h — Written course + hands-on workshop",
+      "mode": "course",
+      "href": "/coach?bloc=3",
+      "courseHref": "/coach?bloc=3",
+      "atelierHref": "/exercise?bloc=3",
       "accentColor": "#FEBA31",
       "recommendedTools": ["gemini", "claude"],
       "objectives": [
@@ -82,25 +88,22 @@
         "Present with critical restitution (not AI magic)"
       ],
       "workshopPrompts": [
-        "Client brief: crisis communication after a product recall.",
-        "Client brief: promote a corporate cultural event."
+        "Scenario A: Urban Weave crisis.",
+        "Scenario B: Lumina Tech pivot.",
+        "Scenario C: FinVault stabilization."
       ],
-      "sampleBrief": "Advertiser wants a launch kit: posts, visuals, 30s video script in 2 hours."
+      "sampleBrief": "Pick a crisis scenario and deliver a multi-format kit in 2 hours."
     }
   ],
   "modules": {
-    "coach": {
-      "title": "Interactive coach",
-      "focus": "Block 1: Prompt structure and strategic copywriting",
-      "expectedDeliverable": "Clear social media message with context, tone, constraints, and format",
-      "interactionScripts": {
-        "1": "Diagnose the student brief: missing role, weak constraints, or vague objective.",
-        "2": "Propose a revised agency brief and one improved sample post."
-      }
+    "course": {
+      "title": "Master class",
+      "focus": "Blocks 1–3: written theory and lessons",
+      "expectedDeliverable": "Read and understand course sections"
     },
-    "exercise": {
+    "atelier": {
       "title": "Practice workshop",
-      "focus": "Blocks 2-3: Visual direction and short-format adaptation",
+      "focus": "Blocks 1–3: voice-led scenarios and multi-tool deliverables",
       "expectedDeliverable": "Revised proposal after AI critique and human improvement",
       "interactionScripts": {
         "1": "Critique the draft for strategic fit, AI clichés, and visual/script coherence.",

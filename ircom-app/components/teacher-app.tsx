@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createDefaultProgress, studentProgressStorageKey } from "@/lib/teacher/progress";
+import {
+  createDefaultProgress,
+  migrateStoredProgress,
+  progressSchemaVersionKey,
+  CURRENT_PROGRESS_SCHEMA_VERSION,
+  studentProgressStorageKey,
+} from "@/lib/teacher/progress";
 import type {
   StudentProgress,
   SupportedLanguage,
@@ -25,6 +31,22 @@ function getSafeJson<T>(value: string | null, fallbackValue: T): T {
   }
 }
 
+function migrateHistoryKeys(): void {
+  const legacyPairs: Array<[string, string]> = [
+    ["coach", "course"],
+    ["exercise", "atelier"],
+  ];
+
+  for (const [legacy, next] of legacyPairs) {
+    const legacyKey = `${historyStoragePrefix}:${legacy}`;
+    const nextKey = `${historyStoragePrefix}:${next}`;
+    const legacyValue = window.localStorage.getItem(legacyKey);
+    if (legacyValue && !window.localStorage.getItem(nextKey)) {
+      window.localStorage.setItem(nextKey, legacyValue);
+    }
+  }
+}
+
 export function useTeacherState() {
   const [language, setLanguage] = useState<SupportedLanguage>("fr");
   const [progress, setProgress] = useState<StudentProgress>(createDefaultProgress);
@@ -37,11 +59,16 @@ export function useTeacherState() {
         setLanguage(persistedLanguage);
       }
 
+      migrateHistoryKeys();
+      const rawProgress = window.localStorage.getItem(studentProgressStorageKey);
       setProgress(
-        getSafeJson<StudentProgress>(
-          window.localStorage.getItem(studentProgressStorageKey),
-          createDefaultProgress(),
+        migrateStoredProgress(
+          rawProgress ? (JSON.parse(rawProgress) as unknown) : null,
         ),
+      );
+      window.localStorage.setItem(
+        progressSchemaVersionKey,
+        String(CURRENT_PROGRESS_SCHEMA_VERSION),
       );
       setIsHydrated(true);
     }, 0);
@@ -71,17 +98,24 @@ export function useTeacherState() {
     });
   };
 
-  const getHistory = (mode: TeacherMode): TeacherRequestMessage[] =>
-    getSafeJson<TeacherRequestMessage[]>(
+  const getHistory = (mode: TeacherMode): TeacherRequestMessage[] => {
+    if (typeof window === "undefined") {
+      return [];
+    }
+    return getSafeJson<TeacherRequestMessage[]>(
       window.localStorage.getItem(`${historyStoragePrefix}:${mode}`),
       [],
     );
+  };
 
   const appendHistory = (
     mode: TeacherMode,
     studentInput: string,
     teacherResponse: TeacherResponseOutput,
   ) => {
+    if (typeof window === "undefined") {
+      return;
+    }
     const existingHistory = getHistory(mode);
     const updatedHistory = [
       ...existingHistory,

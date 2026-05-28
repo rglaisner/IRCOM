@@ -11,16 +11,17 @@ import { t } from "@/lib/copy/ui-messages";
 import { getCurriculum } from "@/lib/teacher/content";
 import { getInteractionCount } from "@/lib/teacher/progress";
 
+const progressModes = ["atelier", "sprint"] as const;
+
 export default function Home() {
   const { language, progress, updateLanguage } = useTeacherState();
   const curriculum = getCurriculum(language);
-  const modes = ["coach", "exercise", "sprint"] as const;
 
-  const totalCompleted = modes.reduce(
+  const totalCompleted = progressModes.reduce(
     (sum, mode) => sum + getInteractionCount(progress, mode),
     0,
   );
-  const totalTarget = modes.length * 2;
+  const totalTarget = progressModes.length * 2;
 
   return (
     <>
@@ -40,10 +41,12 @@ export default function Home() {
           label={t(language, "progressLabel")}
         />
 
-        <section className="grid gap-3 sm:grid-cols-3" aria-label="Mode progress">
-          {modes.map((mode) => (
+        <section className="grid gap-3 sm:grid-cols-2" aria-label="Mode progress">
+          {progressModes.map((mode) => (
             <Card key={mode} data-testid={`${mode}-progress-card`}>
-              <p className="ircom-heading text-sm font-medium capitalize">{mode}</p>
+              <p className="ircom-heading text-sm font-medium">
+                {mode === "atelier" ? t(language, "navAtelier") : t(language, "navSprint")}
+              </p>
               <p className="ircom-secondary mt-1 text-sm">
                 {getInteractionCount(progress, mode)} / 2
               </p>
@@ -54,11 +57,14 @@ export default function Home() {
         <div className="grid gap-4 sm:grid-cols-2">
           {curriculum.blocks.map((block) => {
             const modeProgress =
-              block.mode === "coach"
-                ? progress.coach
-                : block.mode === "exercise"
-                  ? progress.exercise
-                  : progress.sprint;
+              block.mode === "sprint" ? progress.sprint : progress.atelier;
+
+            const primaryHref =
+              block.id <= 3
+                ? (block.courseHref ?? block.href)
+                : block.href;
+            const secondaryHref =
+              block.id <= 3 ? block.atelierHref : undefined;
 
             return (
               <Card
@@ -71,15 +77,35 @@ export default function Home() {
                 </Badge>
                 <h3 className="ircom-heading mt-2 text-lg font-semibold">{block.title}</h3>
                 <p className="ircom-secondary mt-1 text-sm">{block.subtitle}</p>
-                <p className="ircom-secondary mt-3 text-sm">
-                  {modeProgress.interactionsCompleted} / 2 — {t(language, "sessionsTarget")}
-                </p>
-                <Link
-                  href={block.href}
-                  className="mt-4 inline-flex min-h-[var(--ircom-touch-min)] items-center justify-center rounded-[var(--ircom-radius-pill)] bg-[var(--ircom-blue)] px-4 text-sm font-medium text-[var(--ircom-text-on-navy)] hover:opacity-90"
-                >
-                  {t(language, "openMode")}
-                </Link>
+                {block.id <= 3 ? (
+                  <p className="ircom-secondary mt-3 text-xs">
+                    {language === "fr"
+                      ? "Cours écrit + atelier pratique"
+                      : "Written course + hands-on workshop"}
+                  </p>
+                ) : (
+                  <p className="ircom-secondary mt-3 text-sm">
+                    {modeProgress.interactionsCompleted} / 2 — {t(language, "sessionsTarget")}
+                  </p>
+                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    href={primaryHref}
+                    className="inline-flex min-h-[var(--ircom-touch-min)] items-center justify-center rounded-[var(--ircom-radius-pill)] bg-[var(--ircom-blue)] px-4 text-sm font-medium text-[var(--ircom-text-on-navy)] hover:opacity-90"
+                  >
+                    {block.id <= 3
+                      ? t(language, "navCourse")
+                      : t(language, "openMode")}
+                  </Link>
+                  {secondaryHref ? (
+                    <Link
+                      href={secondaryHref}
+                      className="inline-flex min-h-[var(--ircom-touch-min)] items-center justify-center rounded-[var(--ircom-radius-pill)] border border-[var(--ircom-border)] bg-[var(--ircom-surface)] px-4 text-sm font-medium text-[var(--ircom-text-heading)] hover:opacity-90"
+                    >
+                      {t(language, "navAtelier")}
+                    </Link>
+                  ) : null}
+                </div>
               </Card>
             );
           })}

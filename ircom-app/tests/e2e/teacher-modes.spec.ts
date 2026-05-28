@@ -27,6 +27,24 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify(createMockTeacherResponse(`request-${requestCounter}`)),
     });
   });
+
+  await page.route("**/api/atelier/narrate", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "text/plain; charset=utf-8",
+      body: "Briefing vocal simulé pour ce scénario. Vous pouvez interrompre pour poser une question.",
+    });
+  });
+
+  await page.route("**/api/atelier/chat", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: { answer: "Réponse coach simulée pour votre question." },
+      }),
+    });
+  });
 });
 
 test("switches FR/EN and keeps context across modes", async ({ page }) => {
@@ -36,30 +54,30 @@ test("switches FR/EN and keeps context across modes", async ({ page }) => {
   await page.getByTestId("language-select").selectOption("en");
   await expect(page.getByText("Training journey — 12 hours")).toBeVisible();
 
-  await page.getByRole("link", { name: "Coach" }).click();
-  await expect(page.getByText("Block 1 — Brief coach")).toBeVisible();
+  await page.getByLabel("Main").getByRole("link", { name: "Course" }).click();
+  await expect(page.getByText("Course — Block 1")).toBeVisible();
 
   await page.getByRole("link", { name: "Journey" }).click();
   await expect(page.getByText("Four hands-on blocks")).toBeVisible();
 });
 
-test("coach mode supports two contextual interactions", async ({ page }) => {
-  await page.goto("/coach");
+test("cours mode is read-only with section navigation", async ({ page }) => {
+  await page.goto("/coach?bloc=1");
 
-  await page.getByTestId("coach-input").fill("First coaching request");
-  await page.getByTestId("coach-submit").click();
-  await expect(page.getByTestId("coach-response")).toBeVisible();
-  await expect(page.getByText("1 / 2")).toBeVisible();
-
-  await page.getByTestId("coach-input").fill("Second coaching request");
-  await page.getByTestId("coach-submit").click();
-  await expect(page.getByTestId("coach-response")).toContainText("request-2");
-  await expect(page.getByText("2 / 2")).toBeVisible();
+  await expect(page.getByText("Cours — Bloc 1")).toBeVisible();
+  await expect(page.getByTestId("cours-section-philosophy")).toBeVisible();
+  await expect(page.getByTestId("cours-go-atelier")).toBeVisible();
+  await expect(page.getByTestId("coach-submit")).toHaveCount(0);
 });
 
-test("exercise mode supports two iterative attempts", async ({ page }) => {
-  await page.goto("/exercise");
+test("atelier mode supports scenario pick, narration, and deliverable submit", async ({ page }) => {
+  await page.goto("/exercise?bloc=1&scenario=b1-mobilite-launch");
 
+  await expect(page.getByTestId("scenario-card-b1-mobilite-launch")).toBeVisible();
+  await page.getByTestId("narration-start").click();
+  await expect(page.getByTestId("narration-transcript")).toContainText("Briefing vocal");
+
+  await page.getByTestId("toggle-deliverable-panel").click();
   await page.getByTestId("exercise-input").fill("Draft campaign attempt one");
   await page.getByTestId("exercise-submit").click();
   await expect(page.getByTestId("exercise-response")).toContainText("request-1");
@@ -68,53 +86,47 @@ test("exercise mode supports two iterative attempts", async ({ page }) => {
   await page.getByTestId("exercise-input").fill("Revised campaign attempt two");
   await page.getByTestId("exercise-submit").click();
   await expect(page.getByTestId("exercise-response")).toContainText("request-2");
-  await expect(page.getByText("2 / 2")).toBeVisible();
 });
 
-test("sprint mode generates two mission interactions", async ({ page }) => {
+test("sprint mode supports scenario A and two feedback interactions", async ({ page }) => {
   await page.goto("/sprint");
+
+  await page.getByTestId("sprint-scenario-A").click();
+  await expect(page.getByTestId("sprint-brief")).toBeVisible();
+  await page.getByTestId("narration-start").click();
+  await expect(page.getByTestId("narration-transcript")).toContainText("Briefing");
 
   await page.getByTestId("sprint-input").fill("Mission request one");
   await page.getByTestId("sprint-submit").click();
   await expect(page.getByTestId("sprint-response")).toContainText("request-1");
-  await expect(page.getByText("1 / 2")).toBeVisible();
 
   await page.getByTestId("sprint-input").fill("Mission request two");
   await page.getByTestId("sprint-submit").click();
   await expect(page.getByTestId("sprint-response")).toContainText("request-2");
-  await expect(page.getByText("2 / 2")).toBeVisible();
 });
 
-test("cross-mode persistence tracks six completed interactions", async ({ page }) => {
+test("cross-mode persistence tracks four completed atelier+sprint interactions", async ({ page }) => {
   await page.goto("/");
   await page.evaluate(() => window.localStorage.clear());
-  await page.goto("/coach");
-  await page.getByTestId("coach-input").fill("Coach one");
-  await page.getByTestId("coach-submit").click();
-  await expect(page.getByTestId("coach-response")).toContainText("request-1");
-  await page.getByTestId("coach-input").fill("Coach two");
-  await page.getByTestId("coach-submit").click();
-  await expect(page.getByTestId("coach-response")).toContainText("request-2");
-
-  await page.goto("/exercise");
-  await page.getByTestId("exercise-input").fill("Exercise one");
+  await page.goto("/exercise?bloc=1&scenario=b1-mobilite-launch");
+  await page.getByTestId("toggle-deliverable-panel").click();
+  await page.getByTestId("exercise-input").fill("Atelier one");
   await page.getByTestId("exercise-submit").click();
-  await expect(page.getByTestId("exercise-response")).toContainText("request-3");
-  await page.getByTestId("exercise-input").fill("Exercise two");
+  await expect(page.getByTestId("exercise-response")).toContainText("request-1");
+  await page.getByTestId("exercise-input").fill("Atelier two");
   await page.getByTestId("exercise-submit").click();
-  await expect(page.getByTestId("exercise-response")).toContainText("request-4");
+  await expect(page.getByTestId("exercise-response")).toContainText("request-2");
 
   await page.goto("/sprint");
   await page.getByTestId("sprint-input").fill("Sprint one");
   await page.getByTestId("sprint-submit").click();
-  await expect(page.getByTestId("sprint-response")).toContainText("request-5");
+  await expect(page.getByTestId("sprint-response")).toContainText("request-3");
   await page.getByTestId("sprint-input").fill("Sprint two");
   await page.getByTestId("sprint-submit").click();
-  await expect(page.getByTestId("sprint-response")).toContainText("request-6");
+  await expect(page.getByTestId("sprint-response")).toContainText("request-4");
 
   await page.goto("/");
-  await expect(page.getByTestId("coach-progress-card")).toContainText("2 / 2");
-  await expect(page.getByTestId("exercise-progress-card")).toContainText("2 / 2");
+  await expect(page.getByTestId("atelier-progress-card")).toContainText("2 / 2");
   await expect(page.getByTestId("sprint-progress-card")).toContainText("2 / 2");
 });
 

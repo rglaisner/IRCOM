@@ -7,8 +7,8 @@ import type { SupportedLanguage } from "@/lib/teacher/types";
 
 const navItems = [
   { href: "/", labelKey: "navDashboard" as const },
-  { href: "/coach", labelKey: "navCoach" as const },
-  { href: "/exercise", labelKey: "navExercise" as const },
+  { href: "/coach", labelKey: "navCourse" as const },
+  { href: "/exercise", labelKey: "navAtelier" as const },
   { href: "/sprint", labelKey: "navSprint" as const },
 ];
 

@@ -1,0 +1,70 @@
+{
+  "blocs": [
+    {
+      "id": 1,
+      "title": "Fondations du prompt & copy stratégique",
+      "subtitle": "De la requête Google au brief d'agence",
+      "sections": [
+        {
+          "id": "philosophy",
+          "title": "Philosophie : l'illusion de la vitesse",
+          "markdown": "Les LLM génèrent du texte très vite, mais sans directives rigoureuses le résultat reste fade et générique. La compétence clé est l'**Art de la Commande** : passer d'une mentalité « recherche Google » à un **brief d'agence** complet.\n\nL'IA ne possède aucune idée inhérente ni vision stratégique : la valeur reste dans l'intellect humain. Écrire avec l'IA, c'est un dialogue itératif (approche Cyborg/Centaure) : l'humain fournit le paragraphe-noyau, l'IA aide sur la structure et le format."
+        },
+        {
+          "id": "lessons",
+          "title": "Leçons : frameworks RACE et ROCOF",
+          "markdown": "Pour un copy professionnel, imposez **Rôle, Objectif/Action, Contexte, Contraintes, Format**.\n\n| Composant | Objectif |\n| --- | --- |\n| Rôle | Persona expert pour restreindre le champ sémantique |\n| Objectif | Action précise, verbes non ambigus |\n| Contexte | Public, enjeux, historique |\n| Contraintes | Prompts négatifs, longueur, ton |\n| Format | Structure de sortie opérationnelle |\n\nExemple : « Agis en concepteur-rédacteur B2B senior ; rédige un fil LinkedIn en 3 parties sur les retards supply chain ; public : cadres inquiets sur les marges T3 ; sans emojis ; < 150 mots par post ; tableau Markdown avec Accroche / Corps / CTA. »"
+        },
+        {
+          "id": "illustrations",
+          "title": "Illustrations : épidémie du jargon IA",
+          "markdown": "Repérez et éliminez les **tics IA** : « Il ne s'agit pas seulement de… », conclusions trop optimistes, lexique *incontournable, catalyseur, à l'ère de, véritable levier*.\n\nUtilisez des balises `<bans>` et `<prefer>` pour forcer un couloir sémantique authentique. Le contrôle qualité humain reste obligatoire avant publication."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Direction artistique & production visuelle",
+      "subtitle": "Penser comme un directeur artistique",
+      "sections": [
+        {
+          "id": "philosophy",
+          "title": "Philosophie : l'œil du non-graphiste",
+          "markdown": "Diriger un générateur d'images exige le vocabulaire visuel : angles (gros plan, plan hollandais, drone), lumière (volumétrique, heure dorée, Rembrandt), focales, palettes. Sans cela, l'IA produit une esthétique plastique générique immédiatement reconnaissable."
+        },
+        {
+          "id": "lessons",
+          "title": "Leçons : PAO et intégration Firefly",
+          "markdown": "Intégrez l'IA dans vos workflows **PAO** (Photoshop, Illustrator, InDesign). Firefly permet Generative Expand, typographie et vecteurs dans l'environnement professionnel.\n\n**Adobe Firefly** : données sous licence, indemnisation PI pour usage entreprise.\n**Midjourney** : flair créatif supérieur mais risque juridique — réservé aux moodboards internes, pas aux assets publics finaux."
+        },
+        {
+          "id": "illustrations",
+          "title": "Illustrations : EU AI Act et transparence",
+          "markdown": "D'ici août 2026, l'article 50 impose transparence sur le contenu synthétique : métadonnées de provenance, filigranes robustes, étiquettes visibles pour deepfakes.\n\nSanctions jusqu'à 7,5 M€ ou 1,5 % du CA mondial. Vos workflows marketing doivent intégrer ces mécanismes dès la génération."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Formats animés & déclinaison",
+      "subtitle": "Scripts Reels, TikTok, Shorts",
+      "sections": [
+        {
+          "id": "philosophy",
+          "title": "Philosophie : économie de l'attention",
+          "markdown": "Une vidéo verticale 30–60 s exige : **Hook** (3 premières secondes), **Corps** rythmé, **CTA** clair. La **logique de déclinaison** adapte un contenu long (article, livre blanc) en script court sans perdre le message stratégique central."
+        },
+        {
+          "id": "lessons",
+          "title": "Leçons : stack vidéo fragmenté",
+          "markdown": "Aucun outil unique ne couvre scénario, storyboard, voix, B-roll et montage. Workflow type :\n\n1. **Script** (Claude/Gemini) en colonnes dialogue / direction visuelle\n2. **Storyboard** (LTX Studio, Knowlify)\n3. **TTS** (ElevenLabs) comme ancrage timing\n4. **B-roll / avatars** (Runway, Kling, HeyGen, Synthesia)\n5. **Assemblage** (CapCut, Premiere, n8n) — sous-titres, transitions, ratios 9:16 / 16:9"
+        },
+        {
+          "id": "illustrations",
+          "title": "Illustrations : pièges de production",
+          "markdown": "Écueils fréquents : incohérence des personnages entre scènes, désynchronisation audio. Solutions : images de référence (Kling, Luma), ou avatars statiques + B-roll produit abstrait."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "scenarios": [
+    {
+      "id": "b1-mobilite-launch",
+      "blocId": 1,
+      "title": "Sustainable mobility launch",
+      "summary": "Turn a corporate press release into a structured LinkedIn thread with a RACE brief.",
+      "situation": "Your client \"Horizon Mobility\" launches a sustainable mobility offer for urban professionals. You receive a dense 1500-word press release and must produce a 3-post LinkedIn thread reassuring time-pressed executives about ROI and time saved.",
+      "constraints": [
+        "Complete RACE brief required before generation",
+        "No emojis, sober confident tone",
+        "Ban: delve, tapestry, leverage, pivotal, game-changer"
+      ],
+      "deliverables": [
+        "Structured agency brief (Role, Context, Objective, Constraints, Format)",
+        "3-post LinkedIn thread ready to publish",
+        "List of removed AI tics with justification"
+      ],
+      "narrationScript": "Welcome to Block 1 workshop. You are Horizon Mobility's comms lead. The CEO wants a 3-post LinkedIn thread tonight from an overlong press release. Your mission: build a RACE agency brief, then command AI without letting generic jargon through. I'll guide you through client stakes and AI-ism traps. Interrupt me anytime to ask a question.",
+      "linkedCourseSectionIds": ["philosophy", "lessons", "illustrations"],
+      "recommendedTools": ["claude", "gemini", "chatgpt"]
+    },
+    {
+      "id": "b1-jargon-audit",
+      "blocId": 1,
+      "title": "Anti-AI jargon audit",
+      "summary": "Rewrite an AI-generated draft by removing hollow phrasing.",
+      "situation": "Your manager sends a ChatGPT draft internal memo on digital transformation. The tone is recognizably \"AI\" and must be rewritten for a demanding leadership team before sending to 2000 employees.",
+      "constraints": [
+        "Keep facts, change only style and structure",
+        "Use explicit bans/prefer tags in the prompt",
+        "Maximum 400 words output"
+      ],
+      "deliverables": [
+        "Rewrite prompt with XML bans/prefer tags",
+        "Rewritten memo version",
+        "Table: AI phrasing → human phrasing (5 examples)"
+      ],
+      "narrationScript": "Editorial audit scenario. You inherit an internal memo full of AI jargon. Your professional credibility depends on the rewrite. We'll identify tics, build an effective negative prompt, and produce a publishable version. Ask if any passage still sounds too machine-like.",
+      "linkedCourseSectionIds": ["illustrations", "lessons"],
+      "recommendedTools": ["claude", "gemini"]
+    },
+    {
+      "id": "b2-carousel-campaign",
+      "blocId": 2,
+      "title": "LinkedIn carousel — art direction",
+      "summary": "Create and critique key visuals for a corporate campaign.",
+      "situation": "Following Block 1's mobility launch, you must produce a 5-slide LinkedIn carousel: navy/white charter, authentic photos (no plastic stock), message aligned with the copy thread.",
+      "constraints": [
+        "Visual prompts with explicit angle, lighting, palette",
+        "Firefly recommended for public assets",
+        "No deepfake faces without EU AI Act disclosure"
+      ],
+      "deliverables": [
+        "3 documented Firefly prompts (angle, lighting, palette)",
+        "Visual exports or screenshots",
+        "Self-critique: brand fit + AI clichés"
+      ],
+      "narrationScript": "Art direction workshop. You move from text to image for the same Horizon Mobility client. I'll detail the situation, brand constraints, and Firefly vs Midjourney legal risks. You'll then experiment with recommended tools. Raise your hand to clarify a visual prompt.",
+      "linkedCourseSectionIds": ["philosophy", "lessons"],
+      "recommendedTools": ["firefly", "gemini"],
+      "allowsImageUpload": true
+    },
+    {
+      "id": "b2-compliance-visual",
+      "blocId": 2,
+      "title": "EU AI Act visual compliance",
+      "summary": "Choose the right tool under strict legal constraints.",
+      "situation": "A European luxury brand requires web banners with provenance metadata and watermarking. Your team tested Midjourney—legal refused. You must reproduce creative intent in Firefly.",
+      "constraints": [
+        "Firefly only for final deliverables",
+        "Document compliance chain (3 AI Act layers)",
+        "Sober visual tone, no generic AI stock aesthetic"
+      ],
+      "deliverables": [
+        "Tool choice note (1 page)",
+        "2 Firefly banners with compliance checklist",
+        "Metadata + disclosure procedure for the client"
+      ],
+      "narrationScript": "Compliance scenario. Legal just blocked Midjourney for public assets. You must deliver under EU AI Act Article 50. We'll walk through the situation, three transparency layers, and your Firefly workflow. Questions welcome on indemnification and training data provenance.",
+      "linkedCourseSectionIds": ["illustrations", "lessons"],
+      "recommendedTools": ["firefly"],
+      "allowsImageUpload": true
+    },
+    {
+      "id": "b3-reel-script",
+      "blocId": 3,
+      "title": "30-second Reel script",
+      "summary": "Decline a long article into a punchy vertical script.",
+      "situation": "Horizon Mobility's 1000-word blog post must become a 30s Instagram Reel: aggressive hook, paced body, CTA for free trial signup.",
+      "constraints": [
+        "Hook within first 3 seconds",
+        "Separate columns: dialogue / visual direction",
+        "Read-aloud duration: 28–32 seconds"
+      ],
+      "deliverables": [
+        "30s script in Markdown table",
+        "3-shot storyboard for the hook",
+        "Recommended TTS / b-roll tools"
+      ],
+      "narrationScript": "Short-format workshop. Same campaign, new format: 30 seconds to stop the scroll. I present Hook-Body-CTA structure and the fragmented video stack. You'll produce the script then can test with ElevenLabs or your usual tools.",
+      "linkedCourseSectionIds": ["philosophy", "lessons"],
+      "recommendedTools": ["gemini", "claude"]
+    },
+    {
+      "id": "b3-long-to-short",
+      "blocId": 3,
+      "title": "Whitepaper to animated infographic",
+      "summary": "Orchestrate multi-tool declination from a dense PDF.",
+      "situation": "A 12-page mobility whitepaper must feed: a 45s LinkedIn script for investors, and a storyboarded infographic for Knowlify.",
+      "constraints": [
+        "Do not hallucinate figures absent from the PDF",
+        "Institutional tone, no crisis hyperbole",
+        "Document workflow in at least 4 steps"
+      ],
+      "deliverables": [
+        "45s LinkedIn script",
+        "6-scene storyboard outline",
+        "Multi-tool workflow diagram (text)"
+      ],
+      "narrationScript": "Advanced declination scenario. You start from a dense PDF and must deliver two formats without losing the strategic message. We cover extraction, investor script, and storyboard. Interrupt to verify a fact or tool choice.",
+      "linkedCourseSectionIds": ["lessons", "illustrations"],
+      "recommendedTools": ["gemini", "claude"]
+    }
+  ]
+}

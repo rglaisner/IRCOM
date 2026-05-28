@@ -4,9 +4,18 @@ type MessageKey =
   | "productTitle"
   | "productSubtitle"
   | "navDashboard"
-  | "navCoach"
-  | "navExercise"
+  | "navCourse"
+  | "navAtelier"
   | "navSprint"
+  | "goToAtelier"
+  | "courseSections"
+  | "selectScenario"
+  | "startNarration"
+  | "pauseNarration"
+  | "raiseHand"
+  | "openChat"
+  | "workOnDeliverable"
+  | "narrationTranscript"
   | "languageLabel"
   | "journeyTitle"
   | "journeySubtitle"
@@ -29,8 +38,8 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     productTitle: "Ircom",
     productSubtitle: "Studio IA — Management & Communication",
     navDashboard: "Parcours",
-    navCoach: "Coach",
-    navExercise: "Atelier",
+    navCourse: "Cours",
+    navAtelier: "Atelier",
     navSprint: "Sprint",
     languageLabel: "Langue",
     journeyTitle: "Parcours formation — 12 h",
@@ -51,13 +60,22 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     exportSprint: "Exporter le kit sprint",
     toolRouterTitle: "Outils recommandés pour ce bloc",
     pasteBackTitle: "Coller le résultat de ton outil",
+    goToAtelier: "Passer à l'Atelier",
+    courseSections: "Sections du cours",
+    selectScenario: "Choisir un scénario",
+    startNarration: "Écouter le briefing",
+    pauseNarration: "Pause",
+    raiseHand: "Lever la main",
+    openChat: "Poser une question",
+    workOnDeliverable: "Travailler sur le livrable",
+    narrationTranscript: "Transcription en direct",
   },
   en: {
     productTitle: "Ircom",
     productSubtitle: "AI Studio — Management & Communication",
     navDashboard: "Journey",
-    navCoach: "Coach",
-    navExercise: "Workshop",
+    navCourse: "Course",
+    navAtelier: "Workshop",
     navSprint: "Sprint",
     languageLabel: "Language",
     journeyTitle: "Training journey — 12 hours",
@@ -77,6 +95,15 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     exportSprint: "Export sprint kit",
     toolRouterTitle: "Recommended tools for this block",
     pasteBackTitle: "Paste output from your tool",
+    goToAtelier: "Go to Workshop",
+    courseSections: "Course sections",
+    selectScenario: "Choose a scenario",
+    startNarration: "Listen to briefing",
+    pauseNarration: "Pause",
+    raiseHand: "Raise hand",
+    openChat: "Ask a question",
+    workOnDeliverable: "Work on deliverable",
+    narrationTranscript: "Live transcript",
   },
 };
 

@@ -1,8 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
 import { LangSync } from "@/components/lang-sync";
-import { CoachMode } from "@/components/modes/coach-mode";
+import { CoursMode } from "@/components/modes/cours-mode";
 import { useTeacherState } from "@/components/teacher-app";
 
 export default function CoachPage() {
@@ -12,13 +13,9 @@ export default function CoachPage() {
     <>
       <LangSync language={state.language} />
       <AppShell language={state.language} onLanguageChange={state.updateLanguage}>
-        <CoachMode
-          language={state.language}
-          progress={state.progress}
-          registerInteraction={state.registerInteraction}
-          getHistory={state.getHistory}
-          appendHistory={state.appendHistory}
-        />
+        <Suspense fallback={<p className="ircom-secondary text-sm">…</p>}>
+          <CoursMode language={state.language} />
+        </Suspense>
       </AppShell>
     </>
   );
