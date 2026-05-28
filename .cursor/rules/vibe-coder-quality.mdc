@@ -1,0 +1,27 @@
+---
+description: Quality guardrails for reliability, security, and testability
+globs: ["**/*.{ts,tsx,js,jsx,py,go,java,rb,rs,sql}"]
+alwaysApply: true
+---
+
+# Vibe Coder Quality Rules
+
+## Error Resilience Defaults
+- For external API calls, include timeout handling, structured error handling, and fallback behavior by default.
+- Add bounded retry logic only for retry-safe operations.
+- Log failures with contextual inputs (sanitized), not vague strings.
+
+## Testability Requirements
+- Prefer pure functions for core logic where possible.
+- Use dependency injection or explicit interfaces around side effects (network, filesystem, DB, clock).
+- Add fast "vibe-check" coverage for new behavior: happy path plus at least one failure or edge path.
+
+## Security and Performance Checks
+- Validate and sanitize untrusted input at boundaries.
+- Avoid dynamic query/string construction when safe parameterization is available.
+- Flag likely bottlenecks introduced by loops, repeated I/O, or N+1 patterns and remediate before handoff.
+
+## Type and Interface Integrity
+- Preserve strict typing and avoid unsafe type escapes.
+- If API response/contract shape changes, update the corresponding type/interface in the same change.
+- Handle caught errors defensively and narrow unknown values before use.

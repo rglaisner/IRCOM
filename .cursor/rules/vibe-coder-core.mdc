@@ -1,0 +1,27 @@
+---
+description: Core operating constraints for vibe-coding workflows
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Vibe Coder Core Rules
+
+## Primary Execution Model
+- Start with a scoped objective and avoid broad, monolithic implementations.
+- For any medium or large request, produce a short pre-flight outline before writing code.
+- Build incrementally in verifiable slices; finish one slice before expanding scope.
+
+## Context Alignment
+- Use repository context (existing patterns, docs, and interfaces) before introducing new patterns.
+- Prefer architectural consistency over novelty when multiple valid implementations exist.
+- Keep changes localized unless cross-layer changes are explicitly required.
+
+## Readability and Handoff
+- Before final handoff, explain newly developed functions in simple non-technical language.
+- Refactor for readability when generated code is dense, implicit, or hard to review.
+- Use clear naming and explicit control flow over clever but opaque constructs.
+
+## Safe Iteration
+- If an approach drifts from intent, rollback and re-strategize instead of stacking fixes on weak foundations.
+- Surface assumptions early (inputs, dependencies, side effects) so they can be validated quickly.
+- Prefer reversible, low-risk edits that support fast iteration.

@@ -1,0 +1,35 @@
+---
+description: Workflow playbook for planning, debugging, and recovery
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Vibe Coder Workflow Rules
+
+## Pre-Flight Checks
+- Before generating substantial code, outline architecture, dependencies, and implementation slices.
+- Confirm key constraints (runtime, data model, integration boundaries) before execution.
+- Reject ambiguous prompts by requesting missing constraints instead of guessing.
+
+## Focused Scoping
+- Decompose large requests into 3-7 atomic subtasks with explicit outputs.
+- Complete and verify each subtask before starting the next.
+- Keep each subtask independently testable.
+
+## Refactor for Clarity
+- When code is complex or brittle, run a "refactor for clarity" pass:
+  1) explain logic simply,
+  2) rename opaque symbols,
+  3) reduce branching complexity,
+  4) highlight edge cases.
+
+## Debug by Example
+- For debugging, require:
+  - failing snippet,
+  - exact error message,
+  - known-good reference snippet.
+- Diff against the known-good example to isolate behavioral deviation before patching.
+
+## Rollback and Re-Strategize
+- If two consecutive fix attempts fail or broaden risk, revert to last known-good state and propose a revised approach.
+- Prefer a smaller corrected implementation over a large speculative rewrite.
