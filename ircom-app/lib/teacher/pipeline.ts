@@ -89,6 +89,8 @@ export function buildTeacherPrompt(payload: TeacherRequestInput): string {
         : `Checkpoint-only review (step ${payload.briefingStepId}). Give a short spoken-style comment (2-4 sentences) in feedback, not a full scenario critique.`
       : "";
 
+  const attemptNumber = payload.attemptNumber ?? 1;
+
   const responseShape =
     payload.mode === "sprint"
       ? "Include deliverableChecklist (array), rubricScores {strategic,workflow,critical}, qualityScore 0-100."
@@ -96,11 +98,32 @@ export function buildTeacherPrompt(payload: TeacherRequestInput): string {
         ? "Include visualNotes array when critiquing visuals or scripts."
         : "Include recommendedTool when suggesting next production tool.";
 
+  const verdictRules =
+    payload.language === "fr"
+      ? [
+          "Inclus submissionVerdict: accepted | needs_revision | off_topic | game_over.",
+          "off_topic: contenu hors-sujet, blague, spam, ou absence d'effort réel — ton ferme, pas de félicitations.",
+          "needs_revision: effort sincère mais livrable insuffisant — feedback constructif + minAcceptableHint (ce qu'un minimum acceptable contient).",
+          "accepted: répond aux attentes minimales du scénario pour cette interaction.",
+          `game_over: uniquement si attemptNumber est 3 et le livrable reste inacceptable — inclure idealSubmission (exemple idéal).`,
+          `attemptNumber actuel: ${attemptNumber} (max 3).`,
+        ].join(" ")
+      : [
+          "Include submissionVerdict: accepted | needs_revision | off_topic | game_over.",
+          "off_topic: irrelevant, joke, spam, or no real effort — firm tone, no praise.",
+          "needs_revision: genuine effort but deliverable insufficient — constructive feedback + minAcceptableHint.",
+          "accepted: meets minimum scenario expectations for this interaction.",
+          `game_over: only when attemptNumber is 3 and submission remains unacceptable — include idealSubmission.`,
+          `Current attemptNumber: ${attemptNumber} (max 3).`,
+        ].join(" ");
+
   return [
     `You are the IRCOM studio coach (${agentLabel}). Respond in ${getLanguageLabel(payload.language)} only.`,
     roleInstruction,
-    "Return JSON only with keys: title, feedback, nextStep, critiqueChecklist.",
+    "Return JSON only with keys: title, feedback, nextStep, critiqueChecklist, submissionVerdict, attemptNumber.",
+    "Optional keys when relevant: minAcceptableHint, idealSubmission.",
     responseShape,
+    verdictRules,
     "critiqueChecklist must contain 3 to 8 strings.",
     `Program: ${curriculum.programTitle}`,
     `Central goal: ${curriculum.centralGoal}`,

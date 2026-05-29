@@ -1,3 +1,4 @@
+/** @deprecated Briefing audio uses Gemini Live only; text fallback uses /api/atelier/narrate. */
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { z } from "zod";

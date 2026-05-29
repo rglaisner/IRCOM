@@ -14,7 +14,7 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 120_000,
     env: {
-      NEXT_PUBLIC_VOICE_ENGINE: "browser",
+      NEXT_PUBLIC_VOICE_ENGINE: "live",
     },
   },
   projects: [

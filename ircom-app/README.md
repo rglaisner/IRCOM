@@ -75,7 +75,7 @@ The GitHub repo root is not the Next.js app. In Vercel project settings, set **R
 | `GEMINI_MODEL` | No | Defaults to `gemini-3-flash-preview` (REST: coach, chat, critique). |
 | `GEMINI_LIVE_MODEL` | No | Defaults to `gemini-2.5-flash-native-audio-preview-12-2025` (Atelier/Sprint voice). |
 | `GEMINI_TTS_MODEL` | No | Defaults to `gemini-2.5-flash-preview-tts` (voice fallback when Live unavailable). |
-| `VOICE_ENGINE` / `NEXT_PUBLIC_VOICE_ENGINE` | No | Defaults to `live` with fallback chain Live → TTS API → browser speech. |
+| `VOICE_ENGINE` / `NEXT_PUBLIC_VOICE_ENGINE` | No | Defaults to `live` (Gemini Live audio). On failure, streams briefing text via `/api/atelier/narrate` — no browser speech synthesis. |
 | `ANTHROPIC_API_KEY` | No | Optional in-app Claude copy pass (`/api/tools/claude`). |
 | `ADOBE_FIREFLY_API_KEY` | No | Reserved for future Firefly integration; guided link always available. |
 

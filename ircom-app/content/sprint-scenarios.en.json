@@ -46,10 +46,10 @@
       "deliverables": [
         "Customer service FAQ (prompt with bans tags)",
         "3 Firefly transparency banners",
-        "30s infographic script from audit PDF (Knowlify/Claude)"
+        "30s infographic script from audit excerpt below (Knowlify/Claude)"
       ],
       "critiqueFocus": "Firefly vs Midjourney choice; no hallucinated environmental promises.",
-      "briefMarkdown": "## Lumina Tech — Greenwashing pivot\n\n**Context**: contested carbon campaign, toxic manufacturing report.\n\n**Stake**: activists + shareholders.\n\n**Deliverables**: customer FAQ, transparency banners, 30s investor LinkedIn script.\n\n**Prompt bans**: delve, intricate, misunderstanding—absolute accountability tone.",
+      "briefMarkdown": "## Lumina Tech — Greenwashing pivot\n\n**Context**: contested carbon campaign, toxic manufacturing report.\n\n### Audit report excerpt (sole source — do not invent)\n\n- Partner plant **Shenzhen GreenParts**: estimated Scope 3 emissions **4.2 Mt CO₂e/year** (EcoTrace audit, Jan 2026).\n- Marketing claim \"100% carbon neutral\": **unsupported** for manufacturing phase; offset covers European logistics only.\n- Recommendation: remove \"carbon neutral\" visuals and publish FAQ with data above.\n\n**Stake**: activists + shareholders.\n\n**Deliverables**: customer FAQ, transparency banners, 30s investor LinkedIn script.\n\n**Prompt bans**: delve, intricate, misunderstanding—absolute accountability tone.",
       "narrationScript": "Sprint Scenario B. Lumina must pivot under media and legal pressure. EU AI Act compliance mandatory on new visuals. I'll detail deliverables and the Midjourney trap. Two hours for a credible kit.",
       "deliverableChecklist": [
         "Complete customer FAQ",

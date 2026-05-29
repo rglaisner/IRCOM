@@ -5,7 +5,8 @@
       "blocId": 1,
       "title": "Sustainable mobility launch",
       "summary": "Turn a corporate press release into a structured LinkedIn thread with a RACE brief.",
-      "situation": "Your client \"Horizon Mobility\" launches a sustainable mobility offer for urban professionals. You receive a dense 1500-word press release and must produce a 3-post LinkedIn thread reassuring time-pressed executives about ROI and time saved.",
+      "situation": "Your client \"Horizon Mobility\" launches a sustainable mobility offer for urban professionals. The source press release is in the brief below — produce a 3-post LinkedIn thread reassuring time-pressed executives about ROI and time saved.",
+      "briefMarkdown": "## Horizon Mobility — Source press release (excerpt)\n\n**Paris, March 12, 2026** — Horizon Mobility launches \"Flow Urban\", a mobility subscription combining e-bike, scooter, and public transit access for urban professionals.\n\n- **Employer ROI**: internal study of 2,400 users — average 47 min/day saved on commutes (KPMG-audited methodology, March 2025).\n- **Pricing**: €89/month per employee, 12-month commitment, no setup fees for companies with 50+ staff.\n- **Coverage**: Paris, Lyon, Bordeaux from Q2 2026; Marseille and Lille in Q3.\n- **CEO quote**: \"We are not selling a gadget — we are making time lost in transit recoverable for collective performance.\"\n\n**Editorial constraints**: sober tone, no emojis, ban delve / catalyst / game-changer phrasing.",
       "constraints": [
         "Complete RACE brief required before generation",
         "No emojis, sober confident tone",
@@ -125,10 +126,11 @@
       "id": "b3-long-to-short",
       "blocId": 3,
       "title": "Whitepaper to animated infographic",
-      "summary": "Orchestrate multi-tool declination from a dense PDF.",
-      "situation": "A 12-page mobility whitepaper must feed: a 45s LinkedIn script for investors, and a storyboarded infographic for Knowlify.",
+      "summary": "Orchestrate multi-tool declination from the source document below.",
+      "situation": "The mobility whitepaper excerpt below must feed: a 45s LinkedIn script for investors, and a storyboarded infographic for Knowlify.",
+      "briefMarkdown": "## Mobility whitepaper — Excerpt (do not invent figures)\n\n**Title**: Urban mobility 2026 — data and scenarios\n\n1. **Market**: +12% annual growth in multimodal subscriptions in Western Europe (2024-2025).\n2. **Investor stake**: 18% reduction in professional travel costs over 3 years for pilot enterprises (n=120).\n3. **Risk**: saturation of \"all-in-one\" offers without audited ROI — decision-makers require verified metrics.\n4. **Opportunity**: 45s investor scripts on LinkedIn (+34% completion vs text-only posts, Horizon internal source).\n\nUse only these data points for the script and storyboard.",
       "constraints": [
-        "Do not hallucinate figures absent from the PDF",
+        "Do not hallucinate figures absent from the source document above",
         "Institutional tone, no crisis hyperbole",
         "Document workflow in at least 4 steps"
       ],
@@ -137,7 +139,7 @@
         "6-scene storyboard outline",
         "Multi-tool workflow diagram (text)"
       ],
-      "narrationScript": "Advanced declination scenario. You start from a dense PDF and must deliver two formats without losing the strategic message. We cover extraction, investor script, and storyboard. Interrupt to verify a fact or tool choice.",
+      "narrationScript": "Advanced declination scenario. The source document is on screen in the brief — deliver two formats without losing the strategic message. We cover extraction, investor script, and storyboard. Interrupt to verify a fact or tool choice.",
       "linkedCourseSectionIds": ["lessons", "illustrations"],
       "recommendedTools": ["gemini", "claude"]
     }

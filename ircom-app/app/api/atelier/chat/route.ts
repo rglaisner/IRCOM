@@ -1,4 +1,7 @@
-import { buildAtelierChatPrompt } from "@/lib/atelier/pipeline";
+import {
+  buildAtelierChatPrompt,
+  buildSprintChatPrompt,
+} from "@/lib/atelier/pipeline";
 import { generatePlainTextPrompt } from "@/lib/gemini/client";
 import { atelierChatRequestSchema } from "@/lib/teacher/types";
 
@@ -6,7 +9,11 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const payload = (await request.json()) as unknown;
     const parsed = atelierChatRequestSchema.parse(payload);
-    const prompt = buildAtelierChatPrompt(parsed);
+    const context = parsed.context ?? "atelier";
+    const prompt =
+      context === "sprint"
+        ? buildSprintChatPrompt(parsed)
+        : buildAtelierChatPrompt(parsed);
     const answer = await generatePlainTextPrompt(prompt, parsed.language);
 
     return Response.json({ data: { answer } });

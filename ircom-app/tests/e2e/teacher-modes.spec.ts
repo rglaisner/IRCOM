@@ -12,6 +12,8 @@ function createMockTeacherResponse(interactionLabel: string) {
         "Strengthen audience specificity",
       ],
       qualityScore: 72,
+      submissionVerdict: "accepted",
+      attemptNumber: 1,
     },
   };
 }
@@ -98,15 +100,17 @@ test("cours mode is read-only with section navigation", async ({ page }) => {
 });
 
 test("atelier mode supports scenario pick, narration, and deliverable submit", async ({ page }) => {
-  await page.goto("/exercise?bloc=1&scenario=b1-mobilite-launch");
+  await page.goto("/exercise?bloc=1&scenario=b1-jargon-audit");
 
-  await expect(page.getByTestId("scenario-card-b1-mobilite-launch")).toBeVisible();
+  await expect(page.getByTestId("scenario-card-b1-jargon-audit")).toBeVisible();
   await expect(page.getByTestId("atelier-deliverable-panel")).toBeVisible();
   await expect(page.getByTestId("exercise-attachments")).toBeVisible();
+  await expect(page.getByTestId("atelier-brief")).toBeVisible();
   await page.getByTestId("narration-start").click();
-  await expect(page.getByTestId("narration-transcript")).toContainText("Briefing vocal", {
+  await expect(page.getByTestId("narration-transcript")).toContainText("Briefing", {
     timeout: 15_000,
   });
+  await expect(page.getByTestId("voice-fallback-notice")).toBeVisible();
 
   await page.getByTestId("exercise-input").fill("Draft campaign attempt one");
   await page.getByTestId("exercise-submit").click();
@@ -128,6 +132,14 @@ test("sprint mode supports scenario A and two feedback interactions", async ({ p
   await expect(page.getByTestId("sprint-attachments")).toBeVisible();
   await page.getByTestId("narration-start").click();
   await expect(page.getByTestId("narration-transcript")).toContainText("Briefing");
+  await expect(page.getByTestId("sprint-timer-running")).toBeVisible({ timeout: 5_000 });
+
+  await page.getByTestId("toggle-chat").click();
+  await page.getByTestId("atelier-chat-input").fill("Question sur le scénario");
+  await page.getByTestId("atelier-chat-send").click();
+  await expect(page.getByTestId("atelier-chat-panel")).toContainText("Réponse coach", {
+    timeout: 10_000,
+  });
 
   await page.getByTestId("sprint-input").fill("Mission request one");
   await page.getByTestId("sprint-submit").click();

@@ -9,7 +9,6 @@ import {
   startBriefingOrchestration,
   type BriefingOrchestratorSnapshot,
 } from "@/lib/atelier/briefing-orchestrator";
-import { useSpeechSynthesis } from "@/lib/atelier/speech";
 import { getVoiceEngine } from "@/lib/gemini/models";
 import { useAtelierSession } from "@/lib/hooks/use-atelier-session";
 import { useGeminiLiveSession } from "@/lib/hooks/use-gemini-live-session";
@@ -55,56 +54,47 @@ function startOrchestratorForScenario(scenario: SessionScenario): BriefingOrches
   );
 }
 
+export interface AskQuestionResult {
+  answer: string | null;
+  error: string | null;
+}
+
 interface UseVoiceBriefingOptions {
   language: SupportedLanguage;
   scenario: SessionScenario;
   context?: "atelier" | "sprint";
   chatHistory: TeacherRequestMessage[];
   onChatReply: (question: string, answer: string) => void;
-}
-
-async function playGeminiTts(language: SupportedLanguage, text: string): Promise<boolean> {
-  try {
-    const response = await fetch("/api/atelier/speak", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language, text }),
-    });
-    const body = (await response.json()) as {
-      data?: { audioBase64: string; mimeType: string };
-    };
-    if (!response.ok || !body.data?.audioBase64) {
-      return false;
-    }
-
-    const audio = new Audio(`data:${body.data.mimeType};base64,${body.data.audioBase64}`);
-    await audio.play();
-    return true;
-  } catch {
-    return false;
-  }
+  onBriefingStart?: () => void;
 }
 
 export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
-  const { language, scenario, context = "atelier", chatHistory, onChatReply } = options;
+  const {
+    language,
+    scenario,
+    context = "atelier",
+    chatHistory,
+    onChatReply,
+    onBriefingStart,
+  } = options;
   const voiceEngine = getVoiceEngine();
   const useLive = voiceEngine === "live";
 
   const [orchestrator, setOrchestrator] = useState<BriefingOrchestratorSnapshot>(() =>
     getOrchestratorForScenario(scenario),
   );
-  const [fallbackMode, setFallbackMode] = useState(false);
+  const [textFallbackMode, setTextFallbackMode] = useState(false);
+  const [qaTranscript, setQaTranscript] = useState("");
   const orchestratorRef = useRef(orchestrator);
   orchestratorRef.current = orchestrator;
+  const stepIndexRef = useRef(0);
 
   const fallbackSession = useAtelierSession(language);
-  const { speak, stop: stopSpeech, isSpeaking } = useSpeechSynthesis(language);
 
-  const handleLiveTurnComplete = useCallback(() => {
+  const advanceOrchestratorAfterNarration = useCallback(() => {
     if (context !== "atelier" || !("briefingSteps" in scenario)) {
       return;
     }
-
     setOrchestrator((current) => {
       if (current.state !== "narrating") {
         return current;
@@ -113,8 +103,12 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     });
   }, [context, scenario]);
 
+  const handleLiveTurnComplete = useCallback(() => {
+    advanceOrchestratorAfterNarration();
+  }, [advanceOrchestratorAfterNarration]);
+
   const handleFallbackRequired = useCallback(() => {
-    setFallbackMode(true);
+    setTextFallbackMode(true);
   }, []);
 
   const liveSession = useGeminiLiveSession({
@@ -122,148 +116,152 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     scenarioId: scenario.id,
     context,
     briefingStepIndex: orchestrator.stepIndex,
-    enabled: useLive && !fallbackMode,
+    enabled: useLive && !textFallbackMode,
     onTurnComplete: handleLiveTurnComplete,
     onFallbackRequired: handleFallbackRequired,
   });
 
-  const speakFallbackText = useCallback(
-    async (text: string) => {
-      if (text.trim().length === 0) {
-        return;
-      }
-      const ttsOk = await playGeminiTts(language, text);
-      if (!ttsOk) {
-        speak(text);
-      }
-    },
-    [language, speak],
-  );
+  const runTextFallbackNarration = useCallback(async () => {
+    liveSession.clearError();
+    const text = await fallbackSession.streamNarration(scenario.id, { context });
+    if (text.trim().length > 0) {
+      setTextFallbackMode(true);
+      liveSession.clearError();
+      advanceOrchestratorAfterNarration();
+    }
+  }, [
+    advanceOrchestratorAfterNarration,
+    context,
+    fallbackSession,
+    liveSession,
+    scenario.id,
+  ]);
 
   const startBriefing = useCallback(async () => {
-    setOrchestrator(startOrchestratorForScenario(scenario));
+    onBriefingStart?.();
+    const started = startOrchestratorForScenario(scenario);
+    setOrchestrator(started);
+    stepIndexRef.current = started.stepIndex;
 
-    if (useLive && !fallbackMode) {
-      const connected = await liveSession.startBriefing();
+    if (useLive && !textFallbackMode) {
+      const connected = await liveSession.startBriefing(stepIndexRef.current);
       if (connected) {
         return;
       }
-      setFallbackMode(true);
+      setTextFallbackMode(true);
     }
 
-    const text = await fallbackSession.streamNarration(scenario.id, { context });
-    if (text.trim().length > 0) {
-      await speakFallbackText(text);
-    }
+    await runTextFallbackNarration();
   }, [
-    context,
-    fallbackMode,
-    fallbackSession,
     liveSession,
+    onBriefingStart,
+    runTextFallbackNarration,
     scenario,
-    speakFallbackText,
+    textFallbackMode,
     useLive,
   ]);
 
   const pauseBriefing = useCallback(() => {
-    if (useLive && !fallbackMode && liveSession.sessionState !== "idle") {
+    if (useLive && !textFallbackMode && liveSession.sessionState !== "idle") {
       liveSession.pauseBriefing();
-      return;
     }
-    stopSpeech();
-  }, [fallbackMode, liveSession, stopSpeech, useLive]);
+  }, [liveSession, textFallbackMode, useLive]);
 
   const resumeBriefing = useCallback(() => {
-    if (useLive && !fallbackMode && liveSession.sessionState === "paused") {
+    if (useLive && !textFallbackMode && liveSession.sessionState === "paused") {
       liveSession.resumeBriefing();
-      return;
     }
-    if (fallbackSession.transcript.trim().length > 0) {
-      void speakFallbackText(fallbackSession.transcript);
-    }
-  }, [fallbackMode, fallbackSession.transcript, liveSession, speakFallbackText, useLive]);
+  }, [liveSession, textFallbackMode, useLive]);
 
   const raiseHand = useCallback(async () => {
-    if (useLive && !fallbackMode && liveSession.sessionState !== "idle") {
+    if (useLive && !textFallbackMode && liveSession.sessionState !== "idle") {
       await liveSession.raiseHand();
-      return;
     }
-    stopSpeech();
-  }, [fallbackMode, liveSession, stopSpeech, useLive]);
+  }, [liveSession, textFallbackMode, useLive]);
 
   const doneSpeaking = useCallback(() => {
-    if (useLive && !fallbackMode) {
+    if (useLive && !textFallbackMode) {
       liveSession.doneSpeaking();
     }
-  }, [fallbackMode, liveSession, useLive]);
+  }, [liveSession, textFallbackMode, useLive]);
 
   const submitCheckpointToVoice = useCallback(
     (summary: string) => {
-      if (useLive && !fallbackMode) {
+      if (useLive && !textFallbackMode) {
         liveSession.submitCheckpointToLive(summary, orchestratorRef.current.stepIndex);
       } else {
-        void speakFallbackText(summary);
+        setQaTranscript((prev) =>
+          prev.length > 0 ? `${prev}\n\n${summary}` : summary,
+        );
       }
       setOrchestrator((current) => markDeliverableSubmitted(current));
     },
-    [fallbackMode, liveSession, speakFallbackText, useLive],
+    [liveSession, textFallbackMode, useLive],
   );
 
+  const appendQaLine = useCallback((question: string, answer: string) => {
+    const studentLabel = language === "fr" ? "Vous" : "You";
+    const coachLabel = "Coach";
+    const block = `${studentLabel}: ${question}\n${coachLabel}: ${answer}`;
+    setQaTranscript((prev) => (prev.length > 0 ? `${prev}\n\n${block}` : block));
+  }, [language]);
+
   const askQuestion = useCallback(
-    async (question: string) => {
-      if (useLive && !fallbackMode && liveSession.sessionState === "idle") {
-        return null;
-      }
-      stopSpeech();
-      const answer = await fallbackSession.askQuestion(scenario.id, question, chatHistory);
+    async (question: string): Promise<AskQuestionResult> => {
+      const answer = await fallbackSession.askQuestion(scenario.id, question, chatHistory, {
+        context,
+      });
       if (answer) {
         onChatReply(question, answer);
-        if (fallbackMode || !useLive) {
-          await speakFallbackText(answer);
-        }
+        appendQaLine(question, answer);
+        return { answer, error: null };
       }
-      return answer;
+      return {
+        answer: null,
+        error: fallbackSession.errorMessage ?? null,
+      };
     },
-    [
-      chatHistory,
-      fallbackMode,
-      fallbackSession,
-      liveSession.sessionState,
-      onChatReply,
-      scenario.id,
-      speakFallbackText,
-      stopSpeech,
-      useLive,
-    ],
+    [appendQaLine, chatHistory, context, fallbackSession, onChatReply, scenario.id],
   );
 
   useEffect(() => {
     setOrchestrator(getOrchestratorForScenario(scenario));
-    setFallbackMode(false);
-    stopSpeech();
-  }, [scenario.id, scenario, stopSpeech]);
+    setTextFallbackMode(false);
+    setQaTranscript("");
+    liveSession.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when scenario changes
+  }, [scenario.id]);
 
   useEffect(() => {
     if (
       orchestrator.isCheckpointActive &&
       useLive &&
-      !fallbackMode &&
+      !textFallbackMode &&
       liveSession.sessionState === "narrating"
     ) {
       liveSession.enterAwaitingDeliverable();
     }
-  }, [
-    fallbackMode,
-    liveSession,
-    orchestrator.isCheckpointActive,
-    useLive,
-  ]);
+  }, [liveSession, orchestrator.isCheckpointActive, textFallbackMode, useLive]);
 
+  const liveTranscript = liveSession.transcript;
+  const narrateTranscript = fallbackSession.transcript;
+  const baseTranscript =
+    narrateTranscript.length > 0 ? narrateTranscript : liveTranscript;
   const transcript =
-    fallbackSession.transcript.length > 0
-      ? fallbackSession.transcript
-      : liveSession.transcript;
-  const errorMessage = liveSession.errorMessage ?? fallbackSession.errorMessage;
+    qaTranscript.length > 0
+      ? baseTranscript.length > 0
+        ? `${baseTranscript}\n\n${qaTranscript}`
+        : qaTranscript
+      : baseTranscript;
+
+  const narrateFailed = textFallbackMode && narrateTranscript.trim().length === 0;
+  const errorMessage =
+    narrateFailed && fallbackSession.errorMessage
+      ? fallbackSession.errorMessage
+      : !textFallbackMode
+        ? liveSession.errorMessage
+        : null;
+
   const isNarrating =
     fallbackSession.isNarrating ||
     liveSession.sessionState === "connecting" ||
@@ -275,9 +273,9 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     transcript,
     errorMessage,
     isNarrating,
-    isSpeaking,
     isChatLoading: fallbackSession.isChatLoading,
-    isLiveActive: useLive && !fallbackMode && liveSession.sessionState !== "idle",
+    isLiveActive: useLive && !textFallbackMode && liveSession.sessionState !== "idle",
+    isTextFallback: textFallbackMode,
     startBriefing,
     pauseBriefing,
     resumeBriefing,
@@ -285,5 +283,6 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     doneSpeaking,
     submitCheckpointToVoice,
     askQuestion,
+    disconnectLive: liveSession.disconnect,
   };
 }

@@ -46,10 +46,10 @@
       "deliverables": [
         "FAQ service client (prompt avec balises bans)",
         "3 bannières transparence Firefly",
-        "Script infographie 30 s depuis PDF audit (Knowlify/Claude)"
+        "Script infographie 30 s depuis extrait audit ci-dessous (Knowlify/Claude)"
       ],
       "critiqueFocus": "Choix Firefly vs Midjourney ; aucune promesse environnementale hallucinée.",
-      "briefMarkdown": "## Lumina Tech — Pivot greenwashing\n\n**Contexte** : campagne carbone contestée, rapport fabrication toxique.\n\n**Enjeu** : deux fronts (activistes + actionnaires).\n\n**Livrables** : FAQ clients, bannières transparence, script vidéo 30 s investisseurs.\n\n**Interdits prompt** : delve, intricate, malentendu — ton responsabilité absolue.",
+      "briefMarkdown": "## Lumina Tech — Pivot greenwashing\n\n**Contexte** : campagne carbone contestée, rapport fabrication toxique.\n\n### Extrait rapport d'audit (source unique — ne pas inventer)\n\n- Usine partenaire **Shenzhen GreenParts** : émissions Scope 3 estimées à **4,2 Mt CO₂e/an** (audit EcoTrace, janv. 2026).\n- Affirmation marketing « 100 % neutre carbone » : **non étayée** pour la phase fabrication ; compensation uniquement sur logistique Europe.\n- Recommandation : retirer visuels « neutre carbone » et publier FAQ avec données ci-dessus.\n\n**Enjeu** : deux fronts (activistes + actionnaires).\n\n**Livrables** : FAQ clients, bannières transparence, script vidéo 30 s investisseurs.\n\n**Interdits prompt** : delve, intricate, malentendu — ton responsabilité absolue.",
       "narrationScript": "Sprint Scénario B. Lumina Tech doit pivoter sous pression médiatique et juridique. Conformité EU AI Act obligatoire sur les nouveaux visuels. Je détaille les livrables et le piège Midjourney. Vous avez deux heures pour un kit crédible.",
       "deliverableChecklist": [
         "FAQ service client complète",

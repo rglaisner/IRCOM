@@ -95,10 +95,16 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
     sessionStateRef.current = "idle";
   }, []);
 
-  const connectLive = useCallback(async (): Promise<boolean> => {
+  const clearError = useCallback(() => {
+    setErrorMessage(null);
+  }, []);
+
+  const connectLive = useCallback(async (stepIndexOverride?: number): Promise<boolean> => {
     if (!enabled) {
       return false;
     }
+
+    const effectiveStepIndex = stepIndexOverride ?? briefingStepIndex;
 
     setErrorMessage(null);
     setSessionState("connecting");
@@ -114,7 +120,7 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
           language,
           scenarioId,
           context,
-          briefingStepIndex,
+          briefingStepIndex: effectiveStepIndex,
         }),
       });
 
@@ -196,7 +202,6 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
       });
       return true;
     } catch (error: unknown) {
-      setErrorMessage(toUserFacingError(language, error));
       setSessionState("idle");
       sessionStateRef.current = "idle";
       onFallbackRequired?.();
@@ -214,13 +219,16 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
     sendControlTurn,
   ]);
 
-  const startBriefing = useCallback(async (): Promise<boolean> => {
-    const connected = await connectLive();
-    if (!connected) {
-      onFallbackRequired?.();
-    }
-    return connected;
-  }, [connectLive, onFallbackRequired]);
+  const startBriefing = useCallback(
+    async (stepIndexOverride?: number): Promise<boolean> => {
+      const connected = await connectLive(stepIndexOverride);
+      if (!connected) {
+        onFallbackRequired?.();
+      }
+      return connected;
+    },
+    [connectLive, onFallbackRequired],
+  );
 
   const pauseBriefing = useCallback(() => {
     if (sessionStateRef.current !== "narrating" && sessionStateRef.current !== "handRaised") {
@@ -309,6 +317,7 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
     transcript,
     errorMessage,
     engineLabel,
+    clearError,
     startBriefing,
     pauseBriefing,
     resumeBriefing,

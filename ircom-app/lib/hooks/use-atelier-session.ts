@@ -4,6 +4,10 @@ import { useCallback, useState } from "react";
 import { toUserFacingError } from "@/lib/errors/user-facing";
 import type { SupportedLanguage, TeacherRequestMessage } from "@/lib/teacher/types";
 
+interface AskQuestionOptions {
+  context?: "atelier" | "sprint";
+}
+
 export function useAtelierSession(language: SupportedLanguage) {
   const [isNarrating, setIsNarrating] = useState(false);
   const [isChatLoading, setIsChatLoading] = useState(false);
@@ -64,6 +68,7 @@ export function useAtelierSession(language: SupportedLanguage) {
       scenarioId: string,
       question: string,
       history: TeacherRequestMessage[],
+      options?: AskQuestionOptions,
     ): Promise<string | null> => {
       setIsChatLoading(true);
       setErrorMessage(null);
@@ -78,6 +83,7 @@ export function useAtelierSession(language: SupportedLanguage) {
             question,
             transcript,
             history,
+            context: options?.context ?? "atelier",
           }),
         });
 

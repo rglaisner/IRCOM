@@ -75,6 +75,7 @@ export const teacherRequestSchema = z.object({
   sourceTool: z.string().max(32).optional(),
   scenarioId: z.string().max(64).optional(),
   blocId: z.number().int().min(1).max(4).optional(),
+  attemptNumber: z.number().int().min(1).max(3).optional(),
 });
 
 export const atelierNarrateRequestSchema = z.object({
@@ -87,6 +88,7 @@ export const atelierChatRequestSchema = z.object({
   scenarioId: z.string().min(1).max(64),
   question: z.string().trim().min(1).max(2000),
   transcript: z.string().max(12000).optional(),
+  context: z.enum(["atelier", "sprint"]).optional(),
   history: z
     .array(
       z.object({
@@ -97,6 +99,14 @@ export const atelierChatRequestSchema = z.object({
     .max(12)
     .optional(),
 });
+
+export const submissionVerdictSchema = z.enum([
+  "accepted",
+  "needs_revision",
+  "off_topic",
+  "game_over",
+]);
+export type SubmissionVerdict = z.infer<typeof submissionVerdictSchema>;
 
 export const rubricScoresSchema = z.object({
   strategic: z.number().int().min(0).max(100),
@@ -114,6 +124,10 @@ export const teacherResponseSchema = z.object({
   visualNotes: z.array(z.string().min(1)).max(6).optional(),
   qualityScore: z.number().int().min(0).max(100).optional(),
   recommendedTool: z.string().max(64).optional(),
+  submissionVerdict: submissionVerdictSchema.optional(),
+  attemptNumber: z.number().int().min(1).max(3).optional(),
+  minAcceptableHint: z.string().max(2000).optional(),
+  idealSubmission: z.string().max(4000).optional(),
 });
 
 export type TeacherRequestInput = z.infer<typeof teacherRequestSchema>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { VoiceSessionPanel } from "@/components/atelier/voice-session-panel";
 import { useVoiceBriefing } from "@/lib/hooks/use-voice-briefing";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,12 @@ import { stripDataUrlPrefix, toTeacherAttachments } from "@/lib/attachments/read
 import { useTeacherApi } from "@/lib/hooks/use-teacher-api";
 import { getSprintContent, getSprintScenario } from "@/lib/teacher/sprint-content";
 import { getInteractionCount } from "@/lib/teacher/progress";
+import {
+  getScenarioAttempt,
+  recordSubmissionAttempt,
+} from "@/lib/teacher/scenario-attempts";
 import type {
+  SubmissionVerdict,
   StudentProgress,
   SupportedLanguage,
   TeacherMode,
@@ -61,11 +66,16 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
   const [response, setResponse] = useState<TeacherResponseOutput | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(RUSH_SECONDS);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [timeUp, setTimeUp] = useState(false);
   const [chatHistory, setChatHistory] = useState<TeacherRequestMessage[]>([]);
   const { submit, isLoading, errorMessage } = useTeacherApi(props.language);
   const completed = getInteractionCount(props.progress, "sprint");
   const scenario =
     getSprintScenario(props.language, selectedScenarioId) ?? sprintContent.scenarios[0];
+
+  const [attemptRecord, setAttemptRecord] = useState(() =>
+    getScenarioAttempt("sprint", scenario.id),
+  );
 
   const onChatReply = (question: string, answer: string) => {
     setChatHistory((prev) => [
@@ -75,13 +85,42 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
     ]);
   };
 
+  const startRushTimer = useCallback(() => {
+    setSecondsLeft(RUSH_SECONDS);
+    setTimerRunning(true);
+    setTimeUp(false);
+  }, []);
+
   const briefing = useVoiceBriefing({
     language: props.language,
     scenario,
     context: "sprint",
     chatHistory: [...props.getHistory("sprint"), ...chatHistory],
     onChatReply,
+    onBriefingStart: startRushTimer,
   });
+
+  const disconnectLive = briefing.disconnectLive;
+
+  useEffect(() => {
+    setAttemptRecord(getScenarioAttempt("sprint", scenario.id));
+    setResponse(null);
+    setDraft("");
+    setAttachments([]);
+    setSecondsLeft(RUSH_SECONDS);
+    setTimerRunning(false);
+    setTimeUp(false);
+  }, [scenario.id]);
+
+  useEffect(() => {
+    if (!timerRunning || secondsLeft > 0) {
+      return;
+    }
+
+    setTimerRunning(false);
+    setTimeUp(true);
+    disconnectLive();
+  }, [timerRunning, secondsLeft, disconnectLive]);
 
   useEffect(() => {
     if (!timerRunning || secondsLeft <= 0) {
@@ -95,8 +134,10 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
     return () => window.clearInterval(interval);
   }, [timerRunning, secondsLeft]);
 
+  const isLockedOut = attemptRecord.sessionStatus === "locked_out";
+
   const handleSubmit = async () => {
-    if (!scenario || (draft.trim().length === 0 && attachments.length === 0)) {
+    if (!scenario || isLockedOut || (draft.trim().length === 0 && attachments.length === 0)) {
       return;
     }
 
@@ -105,12 +146,14 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
         ? `Scénario ${scenario.letter} — ${scenario.title}\n\nKit de campagne :\n`
         : `Scenario ${scenario.letter} — ${scenario.title}\n\nCampaign kit:\n`;
 
+    const nextAttempt = attemptRecord.attemptCount + 1;
     const firstAttachment = attachments[0];
     const result = await submit({
       mode: "sprint",
       language: props.language,
       studentInput: `${prefix}${draft.trim() || (props.language === "fr" ? "Pièces jointes pour analyse." : "Attachments for analysis.")}`,
       interactionNumber: completed + 1,
+      attemptNumber: nextAttempt,
       history: props.getHistory("sprint"),
       scenarioId: scenario.id,
       blocId: 4,
@@ -119,10 +162,20 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
       ...(attachments.length > 0 ? { attachments: toTeacherAttachments(attachments) } : {}),
     });
 
-    if (result) {
-      setResponse(result);
+    if (!result) {
+      return;
+    }
+
+    const verdict: SubmissionVerdict = result.submissionVerdict ?? "needs_revision";
+    const updatedAttempts = recordSubmissionAttempt("sprint", scenario.id, verdict);
+    setAttemptRecord(updatedAttempts);
+    setResponse(result);
+
+    if (verdict === "accepted") {
       props.registerInteraction("sprint");
       props.appendHistory("sprint", draft, result);
+    } else if (verdict !== "game_over" && updatedAttempts.sessionStatus !== "locked_out") {
+      setDraft("");
     }
   };
 
@@ -168,8 +221,8 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
         title={props.language === "fr" ? "Bloc 4 — Sprint agence" : "Block 4 — Agency sprint"}
         description={
           props.language === "fr"
-            ? "Rush 2 h : choisissez un scénario, produisez, puis Grand Oral."
-            : "2h rush: pick a scenario, produce, then Grand Oral."
+            ? "Rush 2 h : lancez le briefing pour démarrer le chrono, produisez, puis Grand Oral."
+            : "2h rush: start the briefing to begin the clock, produce, then Grand Oral."
         }
       />
 
@@ -202,16 +255,29 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
           <p className="text-2xl font-semibold tabular-nums" data-testid="sprint-timer">
             {formatTime(secondsLeft)}
           </p>
+          {timerRunning ? (
+            <p className="mt-1 text-xs opacity-80" data-testid="sprint-timer-running">
+              {props.language === "fr" ? "Rush en cours" : "Rush in progress"}
+            </p>
+          ) : null}
         </div>
-        <Button
-          variant="secondary"
-          className="!bg-[var(--ircom-surface)] !text-[var(--ircom-text-heading)]"
-          onClick={() => setTimerRunning(true)}
-          data-testid="sprint-start-timer"
-        >
-          {props.language === "fr" ? "Lancer le rush" : "Start rush"}
-        </Button>
+        <p className="max-w-xs text-sm opacity-90">
+          {props.language === "fr"
+            ? "Le chrono démarre avec « Écouter le briefing »."
+            : "The clock starts when you listen to the briefing."}
+        </p>
       </div>
+
+      {timeUp ? (
+        <p
+          className="rounded-[var(--ircom-radius-md)] border border-[var(--ircom-red)] bg-[#f0587211] p-3 text-sm text-[var(--ircom-red)]"
+          data-testid="sprint-time-up"
+        >
+          {props.language === "fr"
+            ? "Temps écoulé — finalisez votre kit ou exportez ce que vous avez."
+            : "Time is up — finalize your kit or export what you have."}
+        </p>
+      ) : null}
 
       <article className="ircom-panel-subtle rounded-[var(--ircom-radius-md)] p-4" data-testid="sprint-brief">
         <h3 className="ircom-heading mb-2 text-lg font-semibold">{scenario.title}</h3>
@@ -249,22 +315,35 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
             ? "Collez votre kit de campagne (texte, notes visuelles, script vidéo)…"
             : "Paste your campaign kit (copy, visual notes, video script)…"
         }
+        disabled={isLockedOut}
         data-testid="sprint-input"
       />
 
-      <Button onClick={handleSubmit} disabled={isLoading} data-testid="sprint-submit">
+      <Button
+        onClick={() => void handleSubmit()}
+        disabled={isLoading || isLockedOut}
+        data-testid="sprint-submit"
+      >
         {isLoading ? t(props.language, "submitting") : t(props.language, "submit")}
       </Button>
 
       {errorMessage ? (
-        <p className="rounded-[var(--ircom-radius-md)] bg-[#f0587222] p-3 text-sm text-[var(--ircom-red)]" data-testid="error-message">
+        <p
+          className="rounded-[var(--ircom-radius-md)] bg-[#f0587222] p-3 text-sm text-[var(--ircom-red)]"
+          data-testid="submit-error-message"
+        >
           {errorMessage}
         </p>
       ) : null}
 
       {response ? (
         <div data-testid="sprint-response">
-          <TeacherFeedback language={props.language} response={response} />
+          <TeacherFeedback
+            language={props.language}
+            response={response}
+            attemptCount={attemptRecord.attemptCount}
+            isLockedOut={isLockedOut}
+          />
           <Button variant="ghost" className="mt-4" onClick={exportKit} data-testid="sprint-export">
             {t(props.language, "exportSprint")}
           </Button>

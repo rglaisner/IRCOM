@@ -36,6 +36,7 @@ export function buildAtelierNarrationPrompt(payload: AtelierNarrateRequest): str
   return [
     `You are an IRCOM atelier facilitator. Speak in ${getLanguageLabel(payload.language)} only.`,
     "Deliver a spoken-style briefing (plain text, no JSON, no markdown headers).",
+    "All source documents are shown in the on-screen brief panel — never tell the student to open an external PDF or file.",
     "Walk through: situation, constraints, deliverables, and how this connects to the course.",
     "Keep paragraphs short for text-to-speech. Target 250–400 words.",
     `Program: ${curriculum.programTitle}`,
@@ -76,6 +77,33 @@ export function buildAtelierChatPrompt(payload: AtelierChatRequest): string {
     .join("\n\n");
 }
 
+export function buildSprintChatPrompt(payload: AtelierChatRequest): string {
+  const scenario = getSprintScenario(payload.language, payload.scenarioId);
+  if (!scenario) {
+    throw new Error("Unknown sprint scenario.");
+  }
+
+  const historySummary =
+    payload.history
+      ?.map((message) => `${message.role.toUpperCase()}: ${message.content}`)
+      .join("\n") ?? "";
+
+  return [
+    `You are an IRCOM sprint agency coach. Answer in ${getLanguageLabel(payload.language)} only.`,
+    "Be concise, practical, and grounded in the scenario. No JSON.",
+    "All source material is in the on-screen brief — never reference an external PDF.",
+    `Scenario ${scenario.letter}: ${scenario.title}`,
+    `Situation: ${scenario.situation}`,
+    `Constraints: ${scenario.constraints.join("; ")}`,
+    `Deliverables: ${scenario.deliverables.join("; ")}`,
+    payload.transcript ? `Narration so far:\n${payload.transcript}` : "",
+    historySummary.length > 0 ? `Chat history:\n${historySummary}` : "",
+    `Student question: ${payload.question}`,
+  ]
+    .filter((line) => line.length > 0)
+    .join("\n\n");
+}
+
 export function buildSprintNarrationPrompt(
   language: SupportedLanguage,
   scenarioId: string,
@@ -90,6 +118,7 @@ export function buildSprintNarrationPrompt(
   return [
     `You are an IRCOM sprint agency producer. Speak in ${getLanguageLabel(language)} only.`,
     "Deliver a rush briefing (plain text, no JSON). 2-hour pressure frame.",
+    "All source documents are in the on-screen brief — never tell the student to open an external PDF.",
     `Program: ${curriculum.programTitle}`,
     `Scenario ${scenario.letter}: ${scenario.title}`,
     `Situation: ${scenario.situation}`,

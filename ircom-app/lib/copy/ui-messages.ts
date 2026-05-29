@@ -18,6 +18,12 @@ type MessageKey =
   | "openChat"
   | "workOnDeliverable"
   | "narrationTranscript"
+  | "voiceFallbackNotice"
+  | "attemptLabel"
+  | "gameOverTitle"
+  | "gameOverHint"
+  | "offTopicTitle"
+  | "needsRevisionTitle"
   | "languageLabel"
   | "journeyTitle"
   | "journeySubtitle"
@@ -73,6 +79,13 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     openChat: "Poser une question",
     workOnDeliverable: "Travailler sur le livrable",
     narrationTranscript: "Transcription en direct",
+    voiceFallbackNotice:
+      "Audio indisponible — lisez le briefing ci-dessus. Vous pouvez lever la main pour un échange vocal si la connexion Live est rétablie.",
+    attemptLabel: "Essai",
+    gameOverTitle: "Session terminée pour ce scénario",
+    gameOverHint: "Trois essais insuffisants. Voici ce qu'une soumission idéale aurait pu contenir :",
+    offTopicTitle: "Hors sujet — recentrez-vous",
+    needsRevisionTitle: "À retravailler",
   },
   en: {
     productTitle: "Ircom",
@@ -110,6 +123,13 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     openChat: "Ask a question",
     workOnDeliverable: "Work on deliverable",
     narrationTranscript: "Live transcript",
+    voiceFallbackNotice:
+      "Audio unavailable — read the briefing above. Raise your hand for live voice when the connection is restored.",
+    attemptLabel: "Attempt",
+    gameOverTitle: "Session ended for this scenario",
+    gameOverHint: "Three insufficient attempts. Here is what an ideal submission could have included:",
+    offTopicTitle: "Off topic — please refocus",
+    needsRevisionTitle: "Needs revision",
   },
 };
 

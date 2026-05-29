@@ -25,7 +25,6 @@ interface VoiceSessionPanelProps {
 export function VoiceSessionPanel({
   language,
   scenario,
-  chatHistory,
   onChatReply,
   briefing,
 }: Readonly<VoiceSessionPanelProps>) {
@@ -35,9 +34,9 @@ export function VoiceSessionPanel({
     transcript,
     errorMessage,
     isNarrating,
-    isSpeaking,
     isChatLoading,
     isLiveActive,
+    isTextFallback,
     startBriefing,
     pauseBriefing,
     resumeBriefing,
@@ -49,23 +48,31 @@ export function VoiceSessionPanel({
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<Array<{ role: "student" | "teacher"; content: string }>>([]);
+  const [chatError, setChatError] = useState<string | null>(null);
+
+  const appendChatExchange = useCallback((question: string, answer: string) => {
+    setChatMessages((prev) => [
+      ...prev,
+      { role: "student", content: question },
+      { role: "teacher", content: answer },
+    ]);
+    onChatReply(question, answer);
+  }, [onChatReply]);
 
   const handleVoiceQuestion = useCallback(
     async (spoken: string) => {
       if (spoken.trim().length === 0) {
         return;
       }
-      const answer = await askQuestion(spoken);
-      if (answer) {
-        setChatMessages((prev) => [
-          ...prev,
-          { role: "student", content: spoken },
-          { role: "teacher", content: answer },
-        ]);
-        onChatReply(spoken, answer);
+      setChatError(null);
+      const result = await askQuestion(spoken);
+      if (result.answer) {
+        appendChatExchange(spoken, result.answer);
+      } else if (result.error) {
+        setChatError(result.error);
       }
     },
-    [askQuestion, onChatReply],
+    [appendChatExchange, askQuestion],
   );
 
   const { isListening, start: startListening, stop: stopListening, isSupported: sttSupported } =
@@ -77,14 +84,13 @@ export function VoiceSessionPanel({
       return;
     }
     setChatInput("");
-    const answer = await askQuestion(question);
-    if (answer) {
-      setChatMessages((prev) => [
-        ...prev,
-        { role: "student", content: question },
-        { role: "teacher", content: answer },
-      ]);
-      onChatReply(question, answer);
+    setChatError(null);
+    setChatOpen(true);
+    const result = await askQuestion(question);
+    if (result.answer) {
+      appendChatExchange(question, result.answer);
+    } else if (result.error) {
+      setChatError(result.error);
     }
   };
 
@@ -102,6 +108,7 @@ export function VoiceSessionPanel({
   useEffect(() => {
     setChatMessages([]);
     setChatOpen(false);
+    setChatError(null);
     stopListening();
   }, [scenario.id, stopListening]);
 
@@ -109,12 +116,21 @@ export function VoiceSessionPanel({
   const isHandRaised = sessionState === "handRaised";
   const canPause =
     isLiveActive &&
-    (sessionState === "narrating" || sessionState === "handRaised" || isSpeaking);
+    (sessionState === "narrating" || sessionState === "handRaised");
   const canResume = isPaused;
 
   return (
     <div className="space-y-4" data-testid="voice-session-panel">
       <TranscriptPanel language={language} transcript={transcript} isStreaming={isNarrating} />
+
+      {isTextFallback && transcript.trim().length > 0 ? (
+        <p
+          className="rounded-[var(--ircom-radius-md)] border border-[var(--ircom-border)] bg-[var(--ircom-panel-subtle)] p-3 text-sm text-[var(--ircom-text-heading)]"
+          data-testid="voice-fallback-notice"
+        >
+          {t(language, "voiceFallbackNotice")}
+        </p>
+      ) : null}
 
       {orchestrator.isCheckpointActive ? (
         <p
@@ -204,6 +220,11 @@ export function VoiceSessionPanel({
               type="text"
               value={chatInput}
               onChange={(event) => setChatInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  void submitChat();
+                }
+              }}
               className="ircom-input min-h-[var(--ircom-touch-min)] flex-1 rounded-[var(--ircom-radius-md)] px-3 text-sm"
               placeholder={language === "fr" ? "Votre question…" : "Your question…"}
               data-testid="atelier-chat-input"
@@ -218,6 +239,11 @@ export function VoiceSessionPanel({
                   : "Send"}
             </Button>
           </div>
+          {chatError ? (
+            <p className="text-sm text-[var(--ircom-red)]" data-testid="chat-error-message">
+              {chatError}
+            </p>
+          ) : null}
           {!sttSupported ? (
             <p className="ircom-secondary text-xs">
               {language === "fr"
@@ -229,7 +255,7 @@ export function VoiceSessionPanel({
       ) : null}
 
       {errorMessage ? (
-        <p className="rounded-[var(--ircom-radius-md)] bg-[#f0587222] p-3 text-sm text-[var(--ircom-red)]" data-testid="error-message">
+        <p className="rounded-[var(--ircom-radius-md)] bg-[#f0587222] p-3 text-sm text-[var(--ircom-red)]" data-testid="voice-error-message">
           {errorMessage}
         </p>
       ) : null}

@@ -4,6 +4,7 @@ import { getGeminiModel } from "@/lib/gemini/models";
 import { buildTeacherPrompt } from "@/lib/teacher/pipeline";
 import {
   teacherResponseSchema,
+  type SubmissionVerdict,
   type TeacherRequestInput,
   type TeacherResponseOutput,
 } from "@/lib/teacher/types";
@@ -93,6 +94,32 @@ function buildContents(input: TeacherRequestInput, prompt: string) {
   return [{ role: "user" as const, parts }];
 }
 
+function enforceSubmissionVerdict(
+  input: TeacherRequestInput,
+  response: TeacherResponseOutput,
+): TeacherResponseOutput {
+  const attemptNumber = input.attemptNumber ?? response.attemptNumber ?? 1;
+  const trimmedInput = input.studentInput.trim();
+  const qualityScore = response.qualityScore ?? 50;
+
+  let verdict: SubmissionVerdict =
+    response.submissionVerdict ?? (qualityScore >= 55 ? "accepted" : "needs_revision");
+
+  if (trimmedInput.length < 25 && qualityScore < 30) {
+    verdict = "off_topic";
+  }
+
+  if (attemptNumber >= 3 && verdict !== "accepted") {
+    verdict = "game_over";
+  }
+
+  return {
+    ...response,
+    submissionVerdict: verdict,
+    attemptNumber,
+  };
+}
+
 export async function generateTeacherResponse(
   input: TeacherRequestInput,
 ): Promise<TeacherResponseOutput> {
@@ -116,7 +143,8 @@ export async function generateTeacherResponse(
     }
 
     const parsedJson = JSON.parse(extractJsonBlock(rawText)) as unknown;
-    return teacherResponseSchema.parse(parsedJson);
+    const parsed = teacherResponseSchema.parse(parsedJson);
+    return enforceSubmissionVerdict(input, parsed);
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       throw new Error(`Invalid response schema: ${error.message}`);

@@ -51,6 +51,7 @@ export const atelierScenarioSchema = z.object({
   recommendedTools: z.array(z.string().min(1)),
   allowsImageUpload: z.boolean().optional(),
   briefingSteps: z.array(briefingStepSchema).optional(),
+  briefMarkdown: z.string().min(1).optional(),
 });
 
 export const atelierContentSchema = z.object({

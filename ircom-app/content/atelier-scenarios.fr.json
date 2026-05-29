@@ -5,7 +5,8 @@
       "blocId": 1,
       "title": "Lancement mobilité durable",
       "summary": "Transformer un communiqué corporate en fil LinkedIn structuré avec brief RACE.",
-      "situation": "Votre client « Horizon Mobilité » lance une offre de mobilité durable pour actifs urbains. Vous recevez un communiqué de presse dense (1500 mots) et devez produire un fil LinkedIn en 3 posts pour rassurer des cadres pressés sur le ROI et le temps gagné.",
+      "situation": "Votre client « Horizon Mobilité » lance une offre de mobilité durable pour actifs urbains. Le communiqué source est reproduit dans le brief ci-dessous — produisez un fil LinkedIn en 3 posts pour rassurer des cadres pressés sur le ROI et le temps gagné.",
+      "briefMarkdown": "## Horizon Mobilité — Communiqué source (extrait)\n\n**Paris, 12 mars 2026** — Horizon Mobilité déploie « Flow Urban », abonnement mobilité combinant vélo électrique, trottinette et accès transports en commun pour les actifs des métropoles françaises.\n\n- **ROI employeur** : étude interne sur 2 400 utilisateurs — gain moyen de 47 min/jour sur les trajets domicile-travail (méthodologie auditée par KPMG, mars 2025).\n- **Tarif** : 89 €/mois par salarié, engagement 12 mois, sans frais d'installation pour les entreprises de plus de 50 collaborateurs.\n- **Couverture** : Paris, Lyon, Bordeaux dès T2 2026 ; Marseille et Lille en T3.\n- **Citation PDG** : « Nous ne vendons pas un gadget — nous rendons le temps perdu dans les transports récupérable pour la performance collective. »\n\n**Contraintes éditoriales** : ton sobre, aucun emoji, interdire incontournable / catalyseur / à l'ère de.",
       "constraints": [
         "Brief RACE complet obligatoire avant génération",
         "Aucun emoji, ton sobre et confiant",
@@ -125,10 +126,11 @@
       "id": "b3-long-to-short",
       "blocId": 3,
       "title": "Du livre blanc à l'infographie animée",
-      "summary": "Orchestrer une déclinaison multi-outils à partir d'un PDF dense.",
-      "situation": "Un livre blanc technique sur la mobilité (12 pages) doit alimenter : un script LinkedIn 45 s pour investisseurs, et une infographie storyboardée pour Knowlify.",
+      "summary": "Orchestrer une déclinaison multi-outils à partir du document source ci-dessous.",
+      "situation": "Le livre blanc technique sur la mobilité (extrait ci-dessous) doit alimenter : un script LinkedIn 45 s pour investisseurs, et une infographie storyboardée pour Knowlify.",
+      "briefMarkdown": "## Livre blanc mobilité — Extrait (ne pas inventer de chiffres)\n\n**Titre** : Mobilité urbaine 2026 — données et scénarios\n\n1. **Marché** : +12 % de croissance annuelle des abonnements multimodaux en Europe de l'Ouest (2024-2025).\n2. **Enjeu investisseur** : réduction de 18 % des coûts de déplacement professionnel sur 3 ans pour les entreprises pilotes (n=120).\n3. **Risque** : saturation des offres « tout-en-un » sans preuve ROI — les décideurs exigent des métriques auditées.\n4. **Opportunité** : scripts investisseurs de 45 s performants sur LinkedIn (taux de complétion +34 % vs posts texte seul, source interne Horizon).\n\nUtilisez uniquement ces données pour le script et le storyboard.",
       "constraints": [
-        "Ne pas halluciner de chiffres absents du PDF",
+        "Ne pas halluciner de chiffres absents du document source ci-dessus",
         "Ton institutionnel, pas de hyperbole crise",
         "Workflow documenté en 4 étapes minimum"
       ],
@@ -137,7 +139,7 @@
         "Outline storyboard 6 scènes",
         "Schéma du workflow multi-outils (texte)"
       ],
-      "narrationScript": "Scénario de déclinaison avancée. Vous partez d'un PDF dense et devez livrer deux formats sans perdre le message stratégique. Nous couvrons l'extraction, le script investisseur et le storyboard. Interrompez pour vérifier un fait ou un choix d'outil.",
+      "narrationScript": "Scénario de déclinaison avancée. Le document source est dans le brief à l'écran — livrez deux formats sans perdre le message stratégique. Nous couvrons l'extraction, le script investisseur et le storyboard. Interrompez pour vérifier un fait ou un choix d'outil.",
       "linkedCourseSectionIds": ["lessons", "illustrations"],
       "recommendedTools": ["gemini", "claude"]
     }
