@@ -6,12 +6,15 @@ import { VoiceSessionPanel } from "@/components/atelier/voice-session-panel";
 import { useVoiceBriefing } from "@/lib/hooks/use-voice-briefing";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { FileUploadButton } from "@/components/ui/file-upload-button";
 import { MarkdownContent } from "@/components/ui/markdown-content";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { TeacherFeedback } from "@/components/studio/teacher-feedback";
 import { ToolRouter } from "@/components/studio/tool-router";
 import { t } from "@/lib/copy/ui-messages";
+import type { PendingAttachment } from "@/lib/attachments/read-files";
+import { stripDataUrlPrefix, toTeacherAttachments } from "@/lib/attachments/read-files";
 import { useTeacherApi } from "@/lib/hooks/use-teacher-api";
 import { getSprintContent, getSprintScenario } from "@/lib/teacher/sprint-content";
 import { getInteractionCount } from "@/lib/teacher/progress";
@@ -54,6 +57,7 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
       : sprintContent.scenarios[0].id,
   );
   const [draft, setDraft] = useState("");
+  const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
   const [response, setResponse] = useState<TeacherResponseOutput | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(RUSH_SECONDS);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -92,7 +96,7 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
   }, [timerRunning, secondsLeft]);
 
   const handleSubmit = async () => {
-    if (!scenario || draft.trim().length === 0) {
+    if (!scenario || (draft.trim().length === 0 && attachments.length === 0)) {
       return;
     }
 
@@ -101,14 +105,18 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
         ? `Scénario ${scenario.letter} — ${scenario.title}\n\nKit de campagne :\n`
         : `Scenario ${scenario.letter} — ${scenario.title}\n\nCampaign kit:\n`;
 
+    const firstAttachment = attachments[0];
     const result = await submit({
       mode: "sprint",
       language: props.language,
-      studentInput: `${prefix}${draft.trim()}`,
+      studentInput: `${prefix}${draft.trim() || (props.language === "fr" ? "Pièces jointes pour analyse." : "Attachments for analysis.")}`,
       interactionNumber: completed + 1,
       history: props.getHistory("sprint"),
       scenarioId: scenario.id,
       blocId: 4,
+      imageBase64: firstAttachment ? stripDataUrlPrefix(firstAttachment.base64) : undefined,
+      imageMimeType: firstAttachment?.mimeType,
+      ...(attachments.length > 0 ? { attachments: toTeacherAttachments(attachments) } : {}),
     });
 
     if (result) {
@@ -225,7 +233,12 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
 
       <ProgressBar value={completed} max={2} label={t(props.language, "progressLabel")} />
 
-      <ToolRouter language={props.language} blockId={4} />
+      <FileUploadButton
+        language={props.language}
+        files={attachments}
+        onFilesSelected={setAttachments}
+        testId="sprint-attachments"
+      />
 
       <textarea
         className="ircom-input min-h-36 w-full rounded-[var(--ircom-radius-md)] p-3 text-sm"
@@ -257,6 +270,8 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
           </Button>
         </div>
       ) : null}
+
+      <ToolRouter language={props.language} blockId={4} />
     </Card>
   );
 }

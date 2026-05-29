@@ -80,6 +80,16 @@ export function MarkdownContent({ markdown, className = "" }: MarkdownContentPro
 
     flushTable();
 
+    if (line.startsWith("### ")) {
+      nodes.push(
+        <h4 key={`h4-${index}`} className="ircom-heading mt-4 text-base font-semibold">
+          {line.slice(4)}
+        </h4>,
+      );
+      index += 1;
+      continue;
+    }
+
     if (line.startsWith("## ")) {
       nodes.push(
         <h3 key={`h-${index}`} className="ircom-heading mt-6 text-lg font-semibold">
@@ -101,6 +111,34 @@ export function MarkdownContent({ markdown, className = "" }: MarkdownContentPro
     }
 
     if (line.trim().length === 0) {
+      continue;
+    }
+
+    if (line.startsWith("> ")) {
+      nodes.push(
+        <blockquote
+          key={`bq-${index}`}
+          className="border-l-4 border-[var(--ircom-blue)] bg-[var(--ircom-panel-subtle)] px-4 py-2 text-sm leading-relaxed"
+        >
+          {renderInline(line.slice(2))}
+        </blockquote>,
+      );
+      index += 1;
+      continue;
+    }
+
+    const numberedMatch = line.match(/^(\d+)\.\s+(.*)$/);
+    if (numberedMatch) {
+      nodes.push(
+        <li
+          key={`ol-${index}`}
+          className="ircom-body ml-4 list-decimal text-sm leading-relaxed"
+          value={Number(numberedMatch[1])}
+        >
+          {renderInline(numberedMatch[2])}
+        </li>,
+      );
+      index += 1;
       continue;
     }
 

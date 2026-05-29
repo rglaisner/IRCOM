@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { t } from "@/lib/copy/ui-messages";
@@ -28,14 +29,17 @@ export function AppShell({
       <header className="border-b border-[var(--ircom-navy)] bg-[var(--ircom-navy)] text-[var(--ircom-text-on-navy)]">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-lg font-semibold tracking-tight">
-                {t(language, "productTitle")}
-              </p>
-              <p className="text-sm text-[var(--ircom-text-on-navy-muted)]">
-                {t(language, "productSubtitle")}
-              </p>
-            </div>
+            <Link href="/" className="inline-flex shrink-0 items-center">
+              <Image
+                src="/ircom-logo-bleu-baseline.png"
+                alt="IRCOM — Humanités et Management"
+                width={160}
+                height={40}
+                priority
+                className="brightness-0 invert"
+                style={{ width: "auto", height: "2.25rem" }}
+              />
+            </Link>
             <label className="flex min-h-[var(--ircom-touch-min)] items-center gap-2 text-sm">
               <span className="sr-only">{t(language, "languageLabel")}</span>
               <select

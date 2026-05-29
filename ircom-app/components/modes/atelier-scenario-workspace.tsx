@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { VoiceSessionPanel } from "@/components/atelier/voice-session-panel";
 import { Button } from "@/components/ui/button";
+import { FileUploadButton } from "@/components/ui/file-upload-button";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { TeacherFeedback } from "@/components/studio/teacher-feedback";
 import { ToolRouter } from "@/components/studio/tool-router";
 import { t } from "@/lib/copy/ui-messages";
+import type { PendingAttachment } from "@/lib/attachments/read-files";
+import { stripDataUrlPrefix, toTeacherAttachments } from "@/lib/attachments/read-files";
 import { useVoiceBriefing } from "@/lib/hooks/use-voice-briefing";
 import { useTeacherApi } from "@/lib/hooks/use-teacher-api";
 import type { AtelierScenario } from "@/lib/teacher/curriculum-types";
@@ -16,15 +19,6 @@ import type {
   TeacherRequestMessage,
   TeacherResponseOutput,
 } from "@/lib/teacher/types";
-
-const MAX_ATTACHMENTS = 3;
-const MAX_ATTACHMENT_BYTES = 4 * 1024 * 1024;
-
-interface PendingAttachment {
-  filename: string;
-  mimeType: string;
-  base64: string;
-}
 
 interface AtelierScenarioWorkspaceProps {
   language: SupportedLanguage;
@@ -62,22 +56,6 @@ export function AtelierScenarioWorkspace(props: Readonly<AtelierScenarioWorkspac
     onChatReply,
   });
 
-  const handleAttachments = async (files: FileList | null) => {
-    if (!files) {
-      return;
-    }
-
-    const next: PendingAttachment[] = [];
-    for (const file of Array.from(files).slice(0, MAX_ATTACHMENTS)) {
-      if (file.size > MAX_ATTACHMENT_BYTES) {
-        continue;
-      }
-      const base64 = await readFileAsDataUrl(file);
-      next.push({ filename: file.name, mimeType: file.type, base64 });
-    }
-    setAttachments(next);
-  };
-
   const handleSubmit = async () => {
     if (draft.trim().length === 0 && attachments.length === 0) {
       return;
@@ -102,17 +80,9 @@ export function AtelierScenarioWorkspace(props: Readonly<AtelierScenarioWorkspac
       blocId: props.scenario.blocId,
       exerciseTab:
         props.scenario.blocId === 3 ? "script" : props.scenario.blocId === 2 ? "visual" : undefined,
-      imageBase64: firstAttachment?.base64.replace(/^data:[^;]+;base64,/, ""),
+      imageBase64: firstAttachment ? stripDataUrlPrefix(firstAttachment.base64) : undefined,
       imageMimeType: firstAttachment?.mimeType,
-      ...(attachments.length > 0
-        ? {
-            attachments: attachments.map((item) => ({
-              filename: item.filename,
-              mimeType: item.mimeType,
-              base64: item.base64.replace(/^data:[^;]+;base64,/, ""),
-            })),
-          }
-        : {}),
+      ...(attachments.length > 0 ? { attachments: toTeacherAttachments(attachments) } : {}),
       briefingStepId:
         isCheckpoint && checkpointStep?.type === "deliverable_checkpoint"
           ? checkpointStep.id
@@ -156,29 +126,12 @@ export function AtelierScenarioWorkspace(props: Readonly<AtelierScenarioWorkspac
           label={t(props.language, "progressLabel")}
         />
 
-        <label className="block space-y-2 text-sm">
-          <span className="ircom-heading font-medium">
-            {props.language === "fr"
-              ? "Pièces jointes (PDF, images, texte — max 3 × 4 Mo)"
-              : "Supporting files (PDF, images, text — max 3 × 4 MB)"}
-          </span>
-          <input
-            type="file"
-            accept=".pdf,.txt,.md,image/*"
-            multiple
-            onChange={(event) => void handleAttachments(event.target.files)}
-            className="min-h-[var(--ircom-touch-min)] w-full text-sm"
-            data-testid="exercise-attachments-input"
-          />
-        </label>
-
-        {attachments.length > 0 ? (
-          <ul className="ircom-secondary list-inside list-disc text-xs">
-            {attachments.map((file) => (
-              <li key={file.filename}>{file.filename}</li>
-            ))}
-          </ul>
-        ) : null}
+        <FileUploadButton
+          language={props.language}
+          files={attachments}
+          onFilesSelected={setAttachments}
+          testId="exercise-attachments"
+        />
 
         <textarea
           className="ircom-input min-h-36 w-full rounded-[var(--ircom-radius-md)] p-3 text-sm"
@@ -211,19 +164,4 @@ export function AtelierScenarioWorkspace(props: Readonly<AtelierScenarioWorkspac
       <ToolRouter language={props.language} blockId={props.scenario.blocId} />
     </>
   );
-}
-
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-        return;
-      }
-      reject(new Error("Failed to read file."));
-    };
-    reader.onerror = () => reject(new Error("Failed to read file."));
-    reader.readAsDataURL(file);
-  });
 }

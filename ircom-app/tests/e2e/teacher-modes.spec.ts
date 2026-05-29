@@ -66,6 +66,7 @@ test.beforeEach(async ({ page }) => {
 test("switches FR/EN and keeps context across modes", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByText("Parcours formation — 12 h")).toBeVisible();
+  await expect(page.getByAltText("IRCOM — Humanités et Management")).toBeVisible();
 
   await page.getByTestId("language-select").selectOption("en");
   await expect(page.getByRole("heading", { level: 2, name: /Training journey/i })).toBeVisible();
@@ -84,6 +85,16 @@ test("cours mode is read-only with section navigation", async ({ page }) => {
   await expect(page.getByTestId("cours-section-philosophy")).toBeVisible();
   await expect(page.getByTestId("cours-go-atelier")).toBeVisible();
   await expect(page.getByTestId("coach-submit")).toHaveCount(0);
+
+  await page.getByTestId("cours-section-lessons").click();
+  await expect(page.getByRole("heading", { level: 4, name: /Points clés|Key takeaways/i })).toBeVisible();
+  await expect(page.getByText("RACE/ROCOF")).toBeVisible();
+
+  await page.getByTestId("cours-section-illustrations").click();
+  await expect(
+    page.getByRole("heading", { level: 4, name: /Checklist pratique|Practical checklist/i }),
+  ).toBeVisible();
+  await expect(page.getByText(/Anti-patterns/i).first()).toBeVisible();
 });
 
 test("atelier mode supports scenario pick, narration, and deliverable submit", async ({ page }) => {
@@ -91,6 +102,7 @@ test("atelier mode supports scenario pick, narration, and deliverable submit", a
 
   await expect(page.getByTestId("scenario-card-b1-mobilite-launch")).toBeVisible();
   await expect(page.getByTestId("atelier-deliverable-panel")).toBeVisible();
+  await expect(page.getByTestId("exercise-attachments")).toBeVisible();
   await page.getByTestId("narration-start").click();
   await expect(page.getByTestId("narration-transcript")).toContainText("Briefing vocal", {
     timeout: 15_000,
@@ -113,6 +125,7 @@ test("sprint mode supports scenario A and two feedback interactions", async ({ p
 
   await page.getByTestId("sprint-scenario-A").click();
   await expect(page.getByTestId("sprint-brief")).toBeVisible();
+  await expect(page.getByTestId("sprint-attachments")).toBeVisible();
   await page.getByTestId("narration-start").click();
   await expect(page.getByTestId("narration-transcript")).toContainText("Briefing");
 

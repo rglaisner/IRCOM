@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { HandRaisedIcon, PauseIcon, PlayIcon } from "@/components/ui/icons";
 import { TranscriptPanel } from "@/components/atelier/transcript-panel";
 import { t } from "@/lib/copy/ui-messages";
 import { useSpeechRecognition } from "@/lib/atelier/speech";
@@ -136,23 +137,36 @@ export function VoiceSessionPanel({
         </Button>
         <Button
           variant="secondary"
-          onClick={pauseBriefing}
-          disabled={!canPause}
-          data-testid="narration-pause"
+          onClick={isPaused ? resumeBriefing : pauseBriefing}
+          disabled={!canPause && !canResume}
+          data-testid="narration-pause-resume"
         >
-          {t(language, "pauseNarration")}
+          {isPaused ? (
+            <>
+              <PlayIcon className="mr-1.5 h-4 w-4" />
+              {t(language, "resumeNarration")}
+            </>
+          ) : (
+            <>
+              <PauseIcon className="mr-1.5 h-4 w-4" />
+              {t(language, "pauseNarration")}
+            </>
+          )}
         </Button>
         <Button
           variant="secondary"
-          onClick={resumeBriefing}
-          disabled={!canResume}
-          data-testid="narration-resume"
+          onClick={() => void handleRaiseHand()}
+          data-testid="raise-hand"
+          aria-label={t(language, "raiseHand")}
+          title={t(language, "raiseHand")}
+          className="!px-3"
         >
-          {t(language, "resumeNarration")}
-        </Button>
-        <Button variant="secondary" onClick={() => void handleRaiseHand()} data-testid="raise-hand">
-          {t(language, "raiseHand")}
-          {isListening ? "…" : ""}
+          <HandRaisedIcon className="h-5 w-5" />
+          {isListening ? (
+            <span className="sr-only" aria-live="polite">
+              {language === "fr" ? "Écoute en cours" : "Listening"}
+            </span>
+          ) : null}
         </Button>
         {isHandRaised ? (
           <Button variant="secondary" onClick={doneSpeaking} data-testid="done-speaking">
