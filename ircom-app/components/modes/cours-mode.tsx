@@ -94,7 +94,7 @@ export function CoursMode({ language }: Readonly<CoursModeProps>) {
           {activeSection ? (
             <>
               <h3 className="ircom-heading mb-4 text-lg font-semibold">{activeSection.title}</h3>
-              <MarkdownContent markdown={activeSection.markdown} />
+              <MarkdownContent markdown={activeSection.markdown} variant="course" />
             </>
           ) : null}
         </article>

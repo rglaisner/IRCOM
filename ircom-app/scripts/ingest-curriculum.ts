@@ -44,13 +44,71 @@ function extractPhilosophyBody(markdown: string, blocNumber: number): string {
   return extractSectionBody(markdown, blocNumber, "Philosophie");
 }
 
-function extractProgramIntro(markdown: string): string {
-  const beforeBloc1 = markdown.split(/## \*\*Bloc 1/i)[0] ?? "";
-  const paragraphs = beforeBloc1
-    .split(/\n\n+/)
-    .map((paragraph) => stripFootnotes(paragraph.replace(/^#+\s*/, "").trim()))
-    .filter((paragraph) => paragraph.length > 80);
-  return paragraphs.slice(0, 2).join("\n\n");
+function buildCompactProgramIntro(language: "fr" | "en"): string {
+  if (language === "fr") {
+    return [
+      "### Principes directeurs",
+      "",
+      "- **Valeur humaine** — L'IA ne possède ni idées, ni vision stratégique, ni empathie ; la valeur reste dans l'intellect humain.",
+      "- **Posture professionnelle** — Gérez l'IA comme un assistant junior : brief rigoureux, cadrage précis, limites strictes, correction continue.",
+      "- **Pragmatisme** — La technologie n'est qu'un levier d'exécution au service de la réflexion critique et de l'intention stratégique.",
+    ].join("\n");
+  }
+
+  return [
+    "### Guiding principles",
+    "",
+    "- **Human value** — AI has no inherent ideas, strategic vision, or empathy; value stays in the human intellect.",
+    "- **Professional posture** — Manage AI like a junior assistant: rigorous brief, precise framing, strict boundaries, continuous correction.",
+    "- **Pragmatism** — Technology is only a lever of execution in service of critical reflection and strategic intent.",
+  ].join("\n");
+}
+
+function splitLongParagraph(text: string, maxLength = 340): string[] {
+  if (text.length <= maxLength) {
+    return [text];
+  }
+
+  const sentences = text.match(/[^.!?]+[.!?]+(?:\s|$)/g) ?? [text];
+  const chunks: string[] = [];
+  let current = "";
+
+  for (const sentence of sentences) {
+    const candidate = `${current}${sentence}`;
+    if (candidate.length > maxLength && current.length > 0) {
+      chunks.push(current.trim());
+      current = sentence;
+      continue;
+    }
+    current = candidate;
+  }
+
+  if (current.trim().length > 0) {
+    chunks.push(current.trim());
+  }
+
+  return chunks.length > 0 ? chunks : [text];
+}
+
+function structurePhilosophyBody(body: string, language: "fr" | "en"): string {
+  const heading = language === "fr" ? "### Enjeu du bloc" : "### Block focus";
+  const paragraphs = body
+    .split(/\n+/)
+    .flatMap((paragraph) => splitLongParagraph(stripFootnotes(paragraph.trim())))
+    .filter((paragraph) => paragraph.length > 0);
+
+  if (paragraphs.length === 0) {
+    return "";
+  }
+
+  return [heading, ...paragraphs].join("\n\n");
+}
+
+function normalizeMarkdownBody(body: string): string {
+  return body
+    .replace(/\.\s+(\|)/g, ".\n\n$1")
+    .replace(/(\|)\s+(?=[A-Za-zÀ-ÿ«])/gu, "$1\n\n")
+    .replace(/\.\s+(\d+\.\s+\*\*)/g, ".\n\n$1");
 }
 
 interface SectionExtras {
@@ -264,7 +322,7 @@ function buildLessonsMarkdown(
   const exampleHeading = language === "fr" ? "### Exemple opérationnel" : "### Operational example";
 
   return [
-    sourceBody,
+    normalizeMarkdownBody(sourceBody),
     heading,
     ...extras.coreConcepts,
     extras.mentalModel,
@@ -288,7 +346,7 @@ function buildIllustrationsMarkdown(
     language === "fr" ? "### Checklist pratique" : "### Practical checklist";
 
   return [
-    sourceBody,
+    normalizeMarkdownBody(sourceBody),
     checklistHeading,
     ...extras.checklist.map((item) => (item.match(/^\d+\./) ? item : `- ${item}`)),
     extras.antiPatterns,
@@ -407,7 +465,6 @@ function buildPhilosophyMarkdown(
   language: "fr" | "en",
   blocNumber: number,
   sourceBody: string,
-  intro: string,
 ): string {
   const extras = language === "fr" ? frExtras[blocNumber] : enExtras[blocNumber];
   const heading =
@@ -422,8 +479,8 @@ function buildPhilosophyMarkdown(
       : "### Practical implications\n\nSee the **Illustrations** section for checklists, anti-patterns, and real-world cases from the curriculum.";
 
   return [
-    intro,
-    sourceBody,
+    buildCompactProgramIntro(language),
+    structurePhilosophyBody(sourceBody, language),
     heading,
     ...extras.coreConcepts,
     extras.mentalModel,
@@ -472,9 +529,6 @@ function main(): void {
   const writeMode = process.argv.includes("--write");
   const frMarkdown = readFileSync(frPath, "utf8");
   const enMarkdown = readFileSync(enPath, "utf8");
-  const frIntro = extractProgramIntro(frMarkdown);
-  const enIntro = extractProgramIntro(enMarkdown);
-
   const frUpdates: SectionUpdates = {};
   const enUpdates: SectionUpdates = {};
 
@@ -487,12 +541,12 @@ function main(): void {
     const enIllustrationsBody = extractSectionBody(enMarkdown, bloc, "Real-Life Illustrations");
 
     frUpdates[bloc] = {
-      philosophy: buildPhilosophyMarkdown("fr", bloc, frBody, frIntro),
+      philosophy: buildPhilosophyMarkdown("fr", bloc, frBody),
       lessons: buildLessonsMarkdown("fr", bloc, frLessonsBody),
       illustrations: buildIllustrationsMarkdown("fr", bloc, frIllustrationsBody),
     };
     enUpdates[bloc] = {
-      philosophy: buildPhilosophyMarkdown("en", bloc, enBody, enIntro),
+      philosophy: buildPhilosophyMarkdown("en", bloc, enBody),
       lessons: buildLessonsMarkdown("en", bloc, enLessonsBody),
       illustrations: buildIllustrationsMarkdown("en", bloc, enIllustrationsBody),
     };
