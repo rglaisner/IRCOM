@@ -25,6 +25,8 @@ type MessageKey =
   | "offTopicTitle"
   | "needsRevisionTitle"
   | "languageLabel"
+  | "restartSession"
+  | "restartSessionConfirm"
   | "journeyTitle"
   | "journeySubtitle"
   | "blockLabel"
@@ -50,6 +52,9 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     navAtelier: "Atelier",
     navSprint: "Sprint",
     languageLabel: "Langue",
+    restartSession: "Recommencer",
+    restartSessionConfirm:
+      "Effacer votre progression, vos essais et l'historique des échanges ? Votre langue (FR/EN) sera conservée.",
     journeyTitle: "Parcours formation — 12 h",
     journeySubtitle:
       "Quatre blocs pratiques : prompt, visuel, format court, sprint agence. Progresse à ton rythme.",
@@ -95,6 +100,9 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     navAtelier: "Workshop",
     navSprint: "Sprint",
     languageLabel: "Language",
+    restartSession: "Start over",
+    restartSessionConfirm:
+      "Clear your progress, attempts, and conversation history? Your language (FR/EN) will be kept.",
     journeyTitle: "Training journey — 12 hours",
     journeySubtitle:
       "Four hands-on blocks: prompting, visuals, short format, agency sprint. Learn at your pace.",

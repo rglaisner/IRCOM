@@ -8,6 +8,7 @@ import {
   CURRENT_PROGRESS_SCHEMA_VERSION,
   studentProgressStorageKey,
 } from "@/lib/teacher/progress";
+import { clearPersistedSession } from "@/lib/teacher/reset-session";
 import type {
   StudentProgress,
   SupportedLanguage,
@@ -129,6 +130,12 @@ export function useTeacherState() {
     );
   };
 
+  const resetSession = () => {
+    clearPersistedSession();
+    setProgress(createDefaultProgress());
+    window.location.assign("/");
+  };
+
   return {
     language,
     progress,
@@ -137,5 +144,6 @@ export function useTeacherState() {
     registerInteraction,
     getHistory,
     appendHistory,
+    resetSession,
   };
 }

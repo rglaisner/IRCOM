@@ -17,10 +17,12 @@ export function AppShell({
   children,
   language,
   onLanguageChange,
+  onRestartSession,
 }: Readonly<{
   children: React.ReactNode;
   language: SupportedLanguage;
   onLanguageChange: (language: SupportedLanguage) => void;
+  onRestartSession?: () => void;
 }>) {
   const pathname = usePathname();
 
@@ -40,21 +42,37 @@ export function AppShell({
                 style={{ width: "auto", height: "2.25rem" }}
               />
             </Link>
-            <label className="flex min-h-[var(--ircom-touch-min)] items-center gap-2 text-sm">
-              <span className="sr-only">{t(language, "languageLabel")}</span>
-              <select
-                className="min-h-[var(--ircom-touch-min)] rounded-[var(--ircom-radius-md)] border border-white/40 bg-white/15 px-3 py-2 text-[var(--ircom-text-on-navy)] [&_option]:bg-white [&_option]:text-[var(--ircom-text)]"
-                value={language}
-                onChange={(event) =>
-                  onLanguageChange(event.target.value as SupportedLanguage)
-                }
-                data-testid="language-select"
-                aria-label={t(language, "languageLabel")}
-              >
-                <option value="fr">FR</option>
-                <option value="en">EN</option>
-              </select>
-            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              {onRestartSession ? (
+                <button
+                  type="button"
+                  className="inline-flex min-h-[var(--ircom-touch-min)] items-center justify-center rounded-[var(--ircom-radius-pill)] border border-white/40 bg-white/10 px-4 text-sm font-medium text-[var(--ircom-text-on-navy)] hover:bg-white/20"
+                  data-testid="restart-session"
+                  onClick={() => {
+                    if (window.confirm(t(language, "restartSessionConfirm"))) {
+                      onRestartSession();
+                    }
+                  }}
+                >
+                  {t(language, "restartSession")}
+                </button>
+              ) : null}
+              <label className="flex min-h-[var(--ircom-touch-min)] items-center gap-2 text-sm">
+                <span className="sr-only">{t(language, "languageLabel")}</span>
+                <select
+                  className="min-h-[var(--ircom-touch-min)] rounded-[var(--ircom-radius-md)] border border-white/40 bg-white/15 px-3 py-2 text-[var(--ircom-text-on-navy)] [&_option]:bg-white [&_option]:text-[var(--ircom-text)]"
+                  value={language}
+                  onChange={(event) =>
+                    onLanguageChange(event.target.value as SupportedLanguage)
+                  }
+                  data-testid="language-select"
+                  aria-label={t(language, "languageLabel")}
+                >
+                  <option value="fr">FR</option>
+                  <option value="en">EN</option>
+                </select>
+              </label>
+            </div>
           </div>
           <nav className="flex flex-wrap gap-2" aria-label="Main">
             {navItems.map((item) => {

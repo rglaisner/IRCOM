@@ -150,6 +150,26 @@ test("sprint mode supports scenario A and two feedback interactions", async ({ p
   await expect(page.getByTestId("sprint-response")).toContainText("request-2");
 });
 
+test("restart session clears progress and returns to dashboard", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.goto("/exercise?bloc=1&scenario=b1-mobilite-launch");
+  await page.getByTestId("exercise-input").first().fill("Atelier one");
+  await page.getByTestId("exercise-submit").first().click();
+  await expect(page.getByTestId("exercise-response").first()).toContainText("request-1", {
+    timeout: 15_000,
+  });
+
+  await page.goto("/");
+  await expect(page.getByTestId("atelier-progress-card")).toContainText("1 / 2");
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByTestId("restart-session").click();
+  await page.waitForURL("/");
+  await expect(page.getByTestId("atelier-progress-card")).toContainText("0 / 2");
+  await expect(page.getByTestId("sprint-progress-card")).toContainText("0 / 2");
+});
+
 test("cross-mode persistence tracks four completed atelier+sprint interactions", async ({ page }) => {
   await page.goto("/");
   await page.evaluate(() => window.localStorage.clear());

@@ -14,7 +14,7 @@ import { getInteractionCount } from "@/lib/teacher/progress";
 const progressModes = ["atelier", "sprint"] as const;
 
 export default function Home() {
-  const { language, progress, updateLanguage } = useTeacherState();
+  const { language, progress, updateLanguage, resetSession } = useTeacherState();
   const curriculum = getCurriculum(language);
 
   const totalCompleted = progressModes.reduce(
@@ -26,7 +26,11 @@ export default function Home() {
   return (
     <>
       <LangSync language={language} />
-      <AppShell language={language} onLanguageChange={updateLanguage}>
+      <AppShell
+        language={language}
+        onLanguageChange={updateLanguage}
+        onRestartSession={resetSession}
+      >
         <section className="space-y-2">
           <h2 className="ircom-heading text-2xl font-semibold">{t(language, "journeyTitle")}</h2>
           <p className="ircom-body text-sm leading-relaxed">{t(language, "journeySubtitle")}</p>
