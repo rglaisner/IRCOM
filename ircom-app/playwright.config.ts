@@ -5,14 +5,17 @@ export default defineConfig({
   fullyParallel: false,
   retries: 0,
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://127.0.0.1:3001",
     trace: "on-first-retry",
   },
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: true,
+    command: "npm run dev -- -p 3001",
+    url: "http://127.0.0.1:3001",
+    reuseExistingServer: false,
     timeout: 120_000,
+    env: {
+      NEXT_PUBLIC_VOICE_ENGINE: "browser",
+    },
   },
   projects: [
     {

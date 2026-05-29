@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
+import { getGeminiModel } from "@/lib/gemini/models";
 import { buildTeacherPrompt } from "@/lib/teacher/pipeline";
 import {
   teacherResponseSchema,
@@ -7,7 +8,7 @@ import {
   type TeacherResponseOutput,
 } from "@/lib/teacher/types";
 
-const modelName = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+const modelName = getGeminiModel();
 
 function extractJsonBlock(rawText: string): string {
   const trimmedText = rawText.trim();
@@ -61,24 +62,35 @@ function getFallbackResponse(input: TeacherRequestInput): TeacherResponseOutput 
 }
 
 function buildContents(input: TeacherRequestInput, prompt: string) {
+  const parts: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }> = [
+    { text: prompt },
+  ];
+
   if (input.imageBase64 && input.imageMimeType) {
-    return [
-      {
-        role: "user" as const,
-        parts: [
-          { text: prompt },
-          {
-            inlineData: {
-              mimeType: input.imageMimeType,
-              data: input.imageBase64.replace(/^data:[^;]+;base64,/, ""),
-            },
-          },
-        ],
+    parts.push({
+      inlineData: {
+        mimeType: input.imageMimeType,
+        data: input.imageBase64.replace(/^data:[^;]+;base64,/, ""),
       },
-    ];
+    });
   }
 
-  return prompt;
+  if (input.attachments && input.attachments.length > 0) {
+    for (const attachment of input.attachments) {
+      parts.push({
+        inlineData: {
+          mimeType: attachment.mimeType,
+          data: attachment.base64.replace(/^data:[^;]+;base64,/, ""),
+        },
+      });
+    }
+  }
+
+  if (parts.length === 1) {
+    return prompt;
+  }
+
+  return [{ role: "user" as const, parts }];
 }
 
 export async function generateTeacherResponse(

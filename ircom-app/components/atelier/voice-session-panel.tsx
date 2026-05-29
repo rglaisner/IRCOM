@@ -4,39 +4,47 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TranscriptPanel } from "@/components/atelier/transcript-panel";
 import { t } from "@/lib/copy/ui-messages";
-import { useAtelierSession } from "@/lib/hooks/use-atelier-session";
-import { useSpeechRecognition, useSpeechSynthesis } from "@/lib/atelier/speech";
+import { useSpeechRecognition } from "@/lib/atelier/speech";
+import type { useVoiceBriefing } from "@/lib/hooks/use-voice-briefing";
 import type { AtelierScenario } from "@/lib/teacher/curriculum-types";
 import type { SprintScenario } from "@/lib/teacher/curriculum-types";
 import type { SupportedLanguage, TeacherRequestMessage } from "@/lib/teacher/types";
 
 type SessionScenario = AtelierScenario | SprintScenario;
+type VoiceBriefing = ReturnType<typeof useVoiceBriefing>;
 
 interface VoiceSessionPanelProps {
   language: SupportedLanguage;
   scenario: SessionScenario;
-  context?: "atelier" | "sprint";
   chatHistory: TeacherRequestMessage[];
   onChatReply: (question: string, answer: string) => void;
+  briefing: VoiceBriefing;
 }
 
 export function VoiceSessionPanel({
   language,
   scenario,
-  context = "atelier",
   chatHistory,
   onChatReply,
+  briefing,
 }: Readonly<VoiceSessionPanelProps>) {
   const {
-    streamNarration,
-    askQuestion,
-    isNarrating,
-    isChatLoading,
+    orchestrator,
+    sessionState,
     transcript,
     errorMessage,
-  } = useAtelierSession(language);
-  const { isSpeaking, speak, stop: stopSpeech } = useSpeechSynthesis(language);
-  const [isPaused, setIsPaused] = useState(false);
+    isNarrating,
+    isSpeaking,
+    isChatLoading,
+    isLiveActive,
+    startBriefing,
+    pauseBriefing,
+    resumeBriefing,
+    raiseHand,
+    doneSpeaking,
+    askQuestion,
+  } = briefing;
+
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<Array<{ role: "student" | "teacher"; content: string }>>([]);
@@ -46,9 +54,7 @@ export function VoiceSessionPanel({
       if (spoken.trim().length === 0) {
         return;
       }
-      stopSpeech();
-      setIsPaused(true);
-      const answer = await askQuestion(scenario.id, spoken, chatHistory);
+      const answer = await askQuestion(spoken);
       if (answer) {
         setChatMessages((prev) => [
           ...prev,
@@ -56,43 +62,13 @@ export function VoiceSessionPanel({
           { role: "teacher", content: answer },
         ]);
         onChatReply(spoken, answer);
-        speak(answer);
       }
     },
-    [askQuestion, scenario.id, chatHistory, onChatReply, speak, stopSpeech],
+    [askQuestion, onChatReply],
   );
 
   const { isListening, start: startListening, stop: stopListening, isSupported: sttSupported } =
     useSpeechRecognition(language, handleVoiceQuestion);
-
-  const startBriefing = async () => {
-    setIsPaused(false);
-    const text = await streamNarration(scenario.id, { context });
-    if (text.trim().length > 0) {
-      speak(text);
-    }
-  };
-
-  const togglePause = () => {
-    if (isSpeaking || isNarrating) {
-      stopSpeech();
-      setIsPaused(true);
-      return;
-    }
-    if (transcript.trim().length > 0) {
-      setIsPaused(false);
-      speak(transcript);
-    }
-  };
-
-  const raiseHand = () => {
-    stopSpeech();
-    setIsPaused(true);
-    setChatOpen(true);
-    if (sttSupported) {
-      startListening();
-    }
-  };
 
   const submitChat = async () => {
     const question = chatInput.trim();
@@ -100,8 +76,7 @@ export function VoiceSessionPanel({
       return;
     }
     setChatInput("");
-    stopSpeech();
-    const answer = await askQuestion(scenario.id, question, chatHistory);
+    const answer = await askQuestion(question);
     if (answer) {
       setChatMessages((prev) => [
         ...prev,
@@ -112,38 +87,78 @@ export function VoiceSessionPanel({
     }
   };
 
+  const handleRaiseHand = async () => {
+    if (isLiveActive) {
+      await raiseHand();
+      return;
+    }
+    setChatOpen(true);
+    if (sttSupported) {
+      startListening();
+    }
+  };
+
   useEffect(() => {
     setChatMessages([]);
     setChatOpen(false);
-    setIsPaused(false);
-    stopSpeech();
     stopListening();
-  }, [scenario.id, stopSpeech, stopListening]);
+  }, [scenario.id, stopListening]);
+
+  const isPaused = sessionState === "paused";
+  const isHandRaised = sessionState === "handRaised";
+  const canPause =
+    isLiveActive &&
+    (sessionState === "narrating" || sessionState === "handRaised" || isSpeaking);
+  const canResume = isPaused;
 
   return (
     <div className="space-y-4" data-testid="voice-session-panel">
       <TranscriptPanel language={language} transcript={transcript} isStreaming={isNarrating} />
 
+      {orchestrator.isCheckpointActive ? (
+        <p
+          className="rounded-[var(--ircom-radius-md)] border border-[var(--ircom-blue)] bg-[#3b74f711] p-3 text-sm text-[var(--ircom-text-heading)]"
+          data-testid="checkpoint-waiting-banner"
+        >
+          {language === "fr"
+            ? "Le formateur attend votre réponse pour continuer."
+            : "Your facilitator is waiting for your answer to continue."}
+        </p>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         <Button
-          onClick={startBriefing}
-          disabled={isNarrating}
+          onClick={() => void startBriefing()}
+          disabled={isNarrating || sessionState === "connecting"}
           data-testid="narration-start"
         >
           {t(language, "startNarration")}
         </Button>
         <Button
           variant="secondary"
-          onClick={togglePause}
-          disabled={transcript.length === 0 && !isSpeaking}
+          onClick={pauseBriefing}
+          disabled={!canPause}
           data-testid="narration-pause"
         >
           {t(language, "pauseNarration")}
         </Button>
-        <Button variant="secondary" onClick={raiseHand} data-testid="raise-hand">
+        <Button
+          variant="secondary"
+          onClick={resumeBriefing}
+          disabled={!canResume}
+          data-testid="narration-resume"
+        >
+          {t(language, "resumeNarration")}
+        </Button>
+        <Button variant="secondary" onClick={() => void handleRaiseHand()} data-testid="raise-hand">
           {t(language, "raiseHand")}
           {isListening ? "…" : ""}
         </Button>
+        {isHandRaised ? (
+          <Button variant="secondary" onClick={doneSpeaking} data-testid="done-speaking">
+            {t(language, "doneSpeaking")}
+          </Button>
+        ) : null}
         <Button variant="ghost" onClick={() => setChatOpen((open) => !open)} data-testid="toggle-chat">
           {t(language, "openChat")}
         </Button>
@@ -176,12 +191,10 @@ export function VoiceSessionPanel({
               value={chatInput}
               onChange={(event) => setChatInput(event.target.value)}
               className="ircom-input min-h-[var(--ircom-touch-min)] flex-1 rounded-[var(--ircom-radius-md)] px-3 text-sm"
-              placeholder={
-                language === "fr" ? "Votre question…" : "Your question…"
-              }
+              placeholder={language === "fr" ? "Votre question…" : "Your question…"}
               data-testid="atelier-chat-input"
             />
-            <Button onClick={submitChat} disabled={isChatLoading} data-testid="atelier-chat-send">
+            <Button onClick={() => void submitChat()} disabled={isChatLoading} data-testid="atelier-chat-send">
               {isChatLoading
                 ? language === "fr"
                   ? "Envoi…"
@@ -207,9 +220,11 @@ export function VoiceSessionPanel({
         </p>
       ) : null}
 
-      {isPaused && !isSpeaking ? (
+      {isPaused ? (
         <p className="ircom-secondary text-xs" data-testid="session-paused-hint">
-          {language === "fr" ? "Session en pause — posez une question ou reprenez l'écoute." : "Session paused — ask a question or resume playback."}
+          {language === "fr"
+            ? "Briefing en pause — reprenez l'écoute quand vous êtes prêt."
+            : "Briefing paused — resume when you are ready."}
         </p>
       ) : null}
     </div>

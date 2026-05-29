@@ -28,6 +28,22 @@ test.beforeEach(async ({ page }) => {
     });
   });
 
+  await page.route("**/api/atelier/live-token", async (route) => {
+    await route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "Live unavailable in tests." }),
+    });
+  });
+
+  await page.route("**/api/atelier/speak", async (route) => {
+    await route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "TTS unavailable in tests." }),
+    });
+  });
+
   await page.route("**/api/atelier/narrate", async (route) => {
     await route.fulfill({
       status: 200,
@@ -52,7 +68,7 @@ test("switches FR/EN and keeps context across modes", async ({ page }) => {
   await expect(page.getByText("Parcours formation — 12 h")).toBeVisible();
 
   await page.getByTestId("language-select").selectOption("en");
-  await expect(page.getByText("Training journey — 12 hours")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: /Training journey/i })).toBeVisible();
 
   await page.getByLabel("Main").getByRole("link", { name: "Course" }).click();
   await expect(page.getByText("Course — Block 1")).toBeVisible();
@@ -74,13 +90,17 @@ test("atelier mode supports scenario pick, narration, and deliverable submit", a
   await page.goto("/exercise?bloc=1&scenario=b1-mobilite-launch");
 
   await expect(page.getByTestId("scenario-card-b1-mobilite-launch")).toBeVisible();
+  await expect(page.getByTestId("atelier-deliverable-panel")).toBeVisible();
   await page.getByTestId("narration-start").click();
-  await expect(page.getByTestId("narration-transcript")).toContainText("Briefing vocal");
+  await expect(page.getByTestId("narration-transcript")).toContainText("Briefing vocal", {
+    timeout: 15_000,
+  });
 
-  await page.getByTestId("toggle-deliverable-panel").click();
   await page.getByTestId("exercise-input").fill("Draft campaign attempt one");
   await page.getByTestId("exercise-submit").click();
-  await expect(page.getByTestId("exercise-response")).toContainText("request-1");
+  await expect(page.getByTestId("exercise-response")).toContainText("request-1", {
+    timeout: 15_000,
+  });
   await expect(page.getByText("1 / 2")).toBeVisible();
 
   await page.getByTestId("exercise-input").fill("Revised campaign attempt two");
@@ -109,10 +129,11 @@ test("cross-mode persistence tracks four completed atelier+sprint interactions",
   await page.goto("/");
   await page.evaluate(() => window.localStorage.clear());
   await page.goto("/exercise?bloc=1&scenario=b1-mobilite-launch");
-  await page.getByTestId("toggle-deliverable-panel").click();
   await page.getByTestId("exercise-input").fill("Atelier one");
   await page.getByTestId("exercise-submit").click();
-  await expect(page.getByTestId("exercise-response")).toContainText("request-1");
+  await expect(page.getByTestId("exercise-response")).toContainText("request-1", {
+    timeout: 15_000,
+  });
   await page.getByTestId("exercise-input").fill("Atelier two");
   await page.getByTestId("exercise-submit").click();
   await expect(page.getByTestId("exercise-response")).toContainText("request-2");

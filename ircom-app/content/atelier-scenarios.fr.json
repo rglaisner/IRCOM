@@ -18,7 +18,26 @@
       ],
       "narrationScript": "Bienvenue dans cet atelier Bloc 1. Vous êtes chargé de communication pour Horizon Mobilité. Le PDG veut un fil LinkedIn en 3 posts d'ici ce soir, à partir d'un communiqué trop long. Votre mission : construire un brief d'agence RACE, puis commander l'IA sans laisser le jargon générique passer. Je vais vous guider sur les enjeux du client et les pièges du jargon IA. Interrompez-moi à tout moment pour poser une question.",
       "linkedCourseSectionIds": ["philosophy", "lessons", "illustrations"],
-      "recommendedTools": ["claude", "gemini", "chatgpt"]
+      "recommendedTools": ["claude", "gemini", "chatgpt"],
+      "briefingSteps": [
+        {
+          "type": "narrate",
+          "id": "intro",
+          "hint": "Contexte Horizon Mobilité, communiqué dense, fil LinkedIn 3 posts, contraintes RACE et anti-jargon."
+        },
+        {
+          "type": "deliverable_checkpoint",
+          "id": "race-steps",
+          "prompt": "Partagez 3 à 4 étapes que vous envisagez pour structurer votre brief RACE et votre fil LinkedIn",
+          "expectedShape": "liste numérotée, 3-4 items",
+          "voiceCue": "Invitez l'étudiant à soumettre ses 3-4 étapes dans le panneau livrable ci-dessous, puis attendez."
+        },
+        {
+          "type": "narrate",
+          "id": "debrief",
+          "hint": "Commentez la soumission, puis détaillez les livrables attendus et la première action concrète."
+        }
+      ]
     },
     {
       "id": "b1-jargon-audit",

@@ -17,6 +17,27 @@ export const courseContentSchema = z.object({
   blocs: z.array(courseBlocSchema).length(3),
 });
 
+export const narrateBriefingStepSchema = z.object({
+  type: z.literal("narrate"),
+  id: z.string().min(1),
+  hint: z.string().min(1),
+});
+
+export const deliverableCheckpointStepSchema = z.object({
+  type: z.literal("deliverable_checkpoint"),
+  id: z.string().min(1),
+  prompt: z.string().min(1),
+  expectedShape: z.string().min(1),
+  voiceCue: z.string().min(1),
+});
+
+export const briefingStepSchema = z.discriminatedUnion("type", [
+  narrateBriefingStepSchema,
+  deliverableCheckpointStepSchema,
+]);
+
+export type BriefingStep = z.infer<typeof briefingStepSchema>;
+
 export const atelierScenarioSchema = z.object({
   id: z.string().min(1),
   blocId: z.number().int().min(1).max(3),
@@ -29,6 +50,7 @@ export const atelierScenarioSchema = z.object({
   linkedCourseSectionIds: z.array(z.string().min(1)),
   recommendedTools: z.array(z.string().min(1)),
   allowsImageUpload: z.boolean().optional(),
+  briefingSteps: z.array(briefingStepSchema).optional(),
 });
 
 export const atelierContentSchema = z.object({

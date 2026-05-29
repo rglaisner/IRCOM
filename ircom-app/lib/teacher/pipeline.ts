@@ -82,6 +82,13 @@ export function buildTeacherPrompt(payload: TeacherRequestInput): string {
 
   const scenarioContext = getScenarioContext(payload);
 
+  const checkpointSection =
+    payload.checkpointOnly && payload.briefingStepId
+      ? payload.language === "fr"
+        ? `Évaluation checkpoint uniquement (étape ${payload.briefingStepId}). Donne un commentaire oral court (2-4 phrases) dans feedback, sans évaluer l'ensemble du scénario.`
+        : `Checkpoint-only review (step ${payload.briefingStepId}). Give a short spoken-style comment (2-4 sentences) in feedback, not a full scenario critique.`
+      : "";
+
   const responseShape =
     payload.mode === "sprint"
       ? "Include deliverableChecklist (array), rubricScores {strategic,workflow,critical}, qualityScore 0-100."
@@ -106,6 +113,7 @@ export function buildTeacherPrompt(payload: TeacherRequestInput): string {
       ? `Interaction script: ${interactionScript}`
       : `Mode instruction: ${getModeInstruction(payload.mode, payload.language)}`,
     scenarioContext.length > 0 ? scenarioContext : "",
+    checkpointSection,
     payload.sourceTool ? `Student used tool: ${payload.sourceTool}` : "",
     briefSection ? `Agency brief fields:\n${briefSection}` : "",
     payload.exerciseTab ? `Exercise tab: ${payload.exerciseTab}` : "",

@@ -12,6 +12,8 @@ type MessageKey =
   | "selectScenario"
   | "startNarration"
   | "pauseNarration"
+  | "resumeNarration"
+  | "doneSpeaking"
   | "raiseHand"
   | "openChat"
   | "workOnDeliverable"
@@ -65,6 +67,8 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     selectScenario: "Choisir un scénario",
     startNarration: "Écouter le briefing",
     pauseNarration: "Pause",
+    resumeNarration: "Reprendre l'écoute",
+    doneSpeaking: "J'ai fini de parler",
     raiseHand: "Lever la main",
     openChat: "Poser une question",
     workOnDeliverable: "Travailler sur le livrable",
@@ -100,6 +104,8 @@ const messages: Record<SupportedLanguage, Record<MessageKey, string>> = {
     selectScenario: "Choose a scenario",
     startNarration: "Listen to briefing",
     pauseNarration: "Pause",
+    resumeNarration: "Resume briefing",
+    doneSpeaking: "Done speaking",
     raiseHand: "Raise hand",
     openChat: "Ask a question",
     workOnDeliverable: "Work on deliverable",

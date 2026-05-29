@@ -59,6 +59,18 @@ export const teacherRequestSchema = z.object({
   briefFields: briefFieldsSchema.optional(),
   imageBase64: z.string().max(6_000_000).optional(),
   imageMimeType: z.string().max(64).optional(),
+  attachments: z
+    .array(
+      z.object({
+        filename: z.string().max(256),
+        mimeType: z.string().max(64),
+        base64: z.string().max(6_000_000),
+      }),
+    )
+    .max(3)
+    .optional(),
+  briefingStepId: z.string().max(64).optional(),
+  checkpointOnly: z.boolean().optional(),
   exerciseTab: z.enum(exerciseTabs).optional(),
   sourceTool: z.string().max(32).optional(),
   scenarioId: z.string().max(64).optional(),

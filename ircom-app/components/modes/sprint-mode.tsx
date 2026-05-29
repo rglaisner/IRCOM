@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { VoiceSessionPanel } from "@/components/atelier/voice-session-panel";
+import { useVoiceBriefing } from "@/lib/hooks/use-voice-briefing";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MarkdownContent } from "@/components/ui/markdown-content";
@@ -59,7 +60,24 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
   const [chatHistory, setChatHistory] = useState<TeacherRequestMessage[]>([]);
   const { submit, isLoading, errorMessage } = useTeacherApi(props.language);
   const completed = getInteractionCount(props.progress, "sprint");
-  const scenario = getSprintScenario(props.language, selectedScenarioId);
+  const scenario =
+    getSprintScenario(props.language, selectedScenarioId) ?? sprintContent.scenarios[0];
+
+  const onChatReply = (question: string, answer: string) => {
+    setChatHistory((prev) => [
+      ...prev,
+      { role: "student", content: question },
+      { role: "teacher", content: answer },
+    ]);
+  };
+
+  const briefing = useVoiceBriefing({
+    language: props.language,
+    scenario,
+    context: "sprint",
+    chatHistory: [...props.getHistory("sprint"), ...chatHistory],
+    onChatReply,
+  });
 
   useEffect(() => {
     if (!timerRunning || secondsLeft <= 0) {
@@ -200,15 +218,9 @@ export function SprintMode(props: Readonly<SprintModeProps>) {
       <VoiceSessionPanel
         language={props.language}
         scenario={scenario}
-        context="sprint"
         chatHistory={[...props.getHistory("sprint"), ...chatHistory]}
-        onChatReply={(question, answer) => {
-          setChatHistory((prev) => [
-            ...prev,
-            { role: "student", content: question },
-            { role: "teacher", content: answer },
-          ]);
-        }}
+        onChatReply={onChatReply}
+        briefing={briefing}
       />
 
       <ProgressBar value={completed} max={2} label={t(props.language, "progressLabel")} />

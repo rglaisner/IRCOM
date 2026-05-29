@@ -18,7 +18,26 @@
       ],
       "narrationScript": "Welcome to Block 1 workshop. You are Horizon Mobility's comms lead. The CEO wants a 3-post LinkedIn thread tonight from an overlong press release. Your mission: build a RACE agency brief, then command AI without letting generic jargon through. I'll guide you through client stakes and AI-ism traps. Interrupt me anytime to ask a question.",
       "linkedCourseSectionIds": ["philosophy", "lessons", "illustrations"],
-      "recommendedTools": ["claude", "gemini", "chatgpt"]
+      "recommendedTools": ["claude", "gemini", "chatgpt"],
+      "briefingSteps": [
+        {
+          "type": "narrate",
+          "id": "intro",
+          "hint": "Horizon Mobility context, dense press release, 3-post LinkedIn thread, RACE and anti-jargon constraints."
+        },
+        {
+          "type": "deliverable_checkpoint",
+          "id": "race-steps",
+          "prompt": "Share 3–4 steps you envision for structuring your RACE brief and LinkedIn thread",
+          "expectedShape": "numbered list, 3-4 items",
+          "voiceCue": "Invite the student to submit their 3-4 steps in the deliverable panel below, then wait."
+        },
+        {
+          "type": "narrate",
+          "id": "debrief",
+          "hint": "Comment on the submission, then detail expected deliverables and the first concrete action."
+        }
+      ]
     },
     {
       "id": "b1-jargon-audit",
