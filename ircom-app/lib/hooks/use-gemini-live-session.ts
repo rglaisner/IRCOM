@@ -13,6 +13,8 @@ import { GEMINI_LIVE_MODEL_DEFAULT } from "@/lib/gemini/models";
 import { toUserFacingError } from "@/lib/errors/user-facing";
 import type { SupportedLanguage } from "@/lib/teacher/types";
 
+const SETUP_COMPLETE_TIMEOUT_MS = 20_000;
+
 export type LiveSessionState =
   | "idle"
   | "connecting"
@@ -28,7 +30,7 @@ interface UseGeminiLiveSessionOptions {
   briefingStepIndex?: number;
   enabled?: boolean;
   onTurnComplete?: () => void;
-  onFallbackRequired?: () => void;
+  onFallbackRequired?: (reason: string | null) => void;
 }
 
 interface LiveSessionHandle {
@@ -41,6 +43,10 @@ interface LiveSessionHandle {
     audioStreamEnd?: boolean;
   }) => void;
   close: () => void;
+}
+
+function isConstrainedLiveToken(token: string): boolean {
+  return token.startsWith("auth_tokens/");
 }
 
 export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
@@ -64,6 +70,9 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
   const micRef = useRef(new LiveMicCapture());
   const transcriptRef = useRef("");
   const sessionStateRef = useRef<LiveSessionState>("idle");
+  const pendingStartTurnRef = useRef<string | null>(null);
+  const setupCompleteResolveRef = useRef<(() => void) | null>(null);
+  const setupCompleteRejectRef = useRef<((error: Error) => void) | null>(null);
 
   const appendTranscript = useCallback((line: string) => {
     transcriptRef.current = transcriptRef.current.length > 0
@@ -79,6 +88,25 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
     [appendTranscript, language],
   );
 
+  const clearSetupWaiters = useCallback(() => {
+    setupCompleteResolveRef.current = null;
+    setupCompleteRejectRef.current = null;
+    pendingStartTurnRef.current = null;
+  }, []);
+
+  const flushPendingStartTurn = useCallback(() => {
+    const turn = pendingStartTurnRef.current;
+    const session = sessionRef.current;
+    if (!turn || !session) {
+      return;
+    }
+    pendingStartTurnRef.current = null;
+    session.sendClientContent({
+      turns: [{ role: "user", parts: [{ text: turn }] }],
+      turnComplete: true,
+    });
+  }, []);
+
   const sendControlTurn = useCallback((text: string) => {
     sessionRef.current?.sendClientContent({
       turns: [{ role: "user", parts: [{ text }] }],
@@ -87,147 +115,191 @@ export function useGeminiLiveSession(options: UseGeminiLiveSessionOptions) {
   }, []);
 
   const disconnect = useCallback(() => {
+    clearSetupWaiters();
     micRef.current.stop();
     playerRef.current.stop();
     sessionRef.current?.close();
     sessionRef.current = null;
     setSessionState("idle");
     sessionStateRef.current = "idle";
-  }, []);
+  }, [clearSetupWaiters]);
 
   const clearError = useCallback(() => {
     setErrorMessage(null);
   }, []);
 
-  const connectLive = useCallback(async (stepIndexOverride?: number): Promise<boolean> => {
-    if (!enabled) {
-      return false;
-    }
+  const waitForSetupComplete = useCallback((): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      setupCompleteResolveRef.current = resolve;
+      setupCompleteRejectRef.current = reject;
 
-    const effectiveStepIndex = stepIndexOverride ?? briefingStepIndex;
+      window.setTimeout(() => {
+        if (setupCompleteRejectRef.current !== reject) {
+          return;
+        }
+        clearSetupWaiters();
+        reject(
+          new Error(
+            language === "fr"
+              ? "Délai dépassé en attente de la session Live."
+              : "Timed out waiting for Live session setup.",
+          ),
+        );
+      }, SETUP_COMPLETE_TIMEOUT_MS);
+    });
+  }, [clearSetupWaiters, language]);
 
-    setErrorMessage(null);
-    setSessionState("connecting");
-    sessionStateRef.current = "connecting";
-    transcriptRef.current = "";
-    setTranscript("");
-
-    try {
-      const response = await fetch("/api/atelier/live-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          language,
-          scenarioId,
-          context,
-          briefingStepIndex: effectiveStepIndex,
-        }),
-      });
-
-      const body = (await response.json()) as {
-        data?: { token: string; model: string; startTurn: string };
-        error?: string;
-      };
-
-      if (!response.ok || !body.data?.token) {
-        throw new Error(body.error ?? "Live token request failed.");
+  const connectLive = useCallback(
+    async (stepIndexOverride?: number): Promise<boolean> => {
+      if (!enabled) {
+        return false;
       }
 
-      const { GoogleGenAI, Modality } = await import("@google/genai");
+      const effectiveStepIndex = stepIndexOverride ?? briefingStepIndex;
 
-      const ai = new GoogleGenAI({
-        apiKey: body.data.token,
-        httpOptions: { apiVersion: "v1alpha" },
-      });
+      setErrorMessage(null);
+      setSessionState("connecting");
+      sessionStateRef.current = "connecting";
+      transcriptRef.current = "";
+      setTranscript("");
+      clearSetupWaiters();
 
-      const session = await ai.live.connect({
-        model: body.data.model ?? GEMINI_LIVE_MODEL_DEFAULT,
-        callbacks: {
-          onopen: () => {
-            setSessionState("narrating");
-            sessionStateRef.current = "narrating";
+      try {
+        const response = await fetch("/api/atelier/live-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            language,
+            scenarioId,
+            context,
+            briefingStepIndex: effectiveStepIndex,
+          }),
+        });
+
+        const body = (await response.json()) as {
+          data?: { token: string; model: string; startTurn: string };
+          error?: string;
+        };
+
+        if (!response.ok || !body.data?.token) {
+          throw new Error(body.error ?? "Live token request failed.");
+        }
+
+        const token = body.data.token;
+        const model = body.data.model ?? GEMINI_LIVE_MODEL_DEFAULT;
+        const constrained = isConstrainedLiveToken(token);
+
+        const { GoogleGenAI } = await import("@google/genai");
+
+        const ai = new GoogleGenAI({
+          apiKey: token,
+          httpOptions: { apiVersion: "v1alpha" },
+        });
+
+        pendingStartTurnRef.current = body.data.startTurn;
+
+        const setupPromise = waitForSetupComplete();
+
+        const session = await ai.live.connect({
+          model,
+          callbacks: {
+            onopen: () => {
+              /* Narrating starts after setupComplete, not on socket open. */
+            },
+            onmessage: (message) => {
+              if (message.setupComplete) {
+                flushPendingStartTurn();
+                setSessionState("narrating");
+                sessionStateRef.current = "narrating";
+                setupCompleteResolveRef.current?.();
+                setupCompleteResolveRef.current = null;
+                setupCompleteRejectRef.current = null;
+              }
+
+              if (message.serverContent?.interrupted) {
+                playerRef.current.stop();
+              }
+
+              const outputText = message.serverContent?.outputTranscription?.text;
+              if (outputText) {
+                appendTranscript(outputText);
+              }
+
+              const inputText = message.serverContent?.inputTranscription?.text;
+              if (inputText) {
+                appendTranscript(
+                  language === "fr" ? `Vous : ${inputText}` : `You: ${inputText}`,
+                );
+              }
+
+              const audioData = message.data;
+              if (audioData && sessionStateRef.current !== "paused") {
+                void playerRef.current.playBase64Pcm(audioData);
+              }
+
+              if (message.serverContent?.turnComplete) {
+                onTurnComplete?.();
+              }
+            },
+            onerror: (event: ErrorEvent) => {
+              const detail =
+                event.message?.trim().length > 0
+                  ? event.message
+                  : language === "fr"
+                    ? "Connexion Live interrompue."
+                    : "Live connection interrupted.";
+              setErrorMessage(detail);
+              setupCompleteRejectRef.current?.(new Error(detail));
+              setupCompleteRejectRef.current = null;
+              setupCompleteResolveRef.current = null;
+            },
+            onclose: () => {
+              if (sessionStateRef.current !== "idle") {
+                setSessionState("idle");
+                sessionStateRef.current = "idle";
+              }
+            },
           },
-          onmessage: (message) => {
-            if (message.serverContent?.interrupted) {
-              playerRef.current.stop();
-            }
+          // Config is locked in the ephemeral token (auth_tokens/*); do not pass config here.
+        });
 
-            const outputText = message.serverContent?.outputTranscription?.text;
-            if (outputText) {
-              appendTranscript(outputText);
-            }
+        sessionRef.current = session;
+        setEngineLabel("live");
 
-            const inputText = message.serverContent?.inputTranscription?.text;
-            if (inputText) {
-              appendTranscript(
-                language === "fr" ? `Vous : ${inputText}` : `You: ${inputText}`,
-              );
-            }
-
-            const audioData = message.data;
-            if (audioData && sessionStateRef.current !== "paused") {
-              void playerRef.current.playBase64Pcm(audioData);
-            }
-
-            if (message.serverContent?.turnComplete) {
-              onTurnComplete?.();
-            }
-          },
-          onerror: () => {
-            setErrorMessage(
-              language === "fr"
-                ? "Connexion Live interrompue."
-                : "Live connection interrupted.",
-            );
-          },
-          onclose: () => {
-            if (sessionStateRef.current !== "idle") {
-              setSessionState("idle");
-              sessionStateRef.current = "idle";
-            }
-          },
-        },
-        config: {
-          responseModalities: [Modality.AUDIO],
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
-        },
-      });
-
-      sessionRef.current = session;
-      setEngineLabel("live");
-      session.sendClientContent({
-        turns: [{ role: "user", parts: [{ text: body.data.startTurn }] }],
-        turnComplete: true,
-      });
-      return true;
-    } catch (error: unknown) {
-      setSessionState("idle");
-      sessionStateRef.current = "idle";
-      onFallbackRequired?.();
-      return false;
-    }
-  }, [
-    appendTranscript,
-    briefingStepIndex,
-    context,
-    enabled,
-    language,
-    onFallbackRequired,
-    onTurnComplete,
-    scenarioId,
-    sendControlTurn,
-  ]);
+        await setupPromise;
+        return true;
+      } catch (error: unknown) {
+        const reason =
+          error instanceof Error ? error.message : "Live connection failed.";
+        setErrorMessage(toUserFacingError(language, error));
+        setSessionState("idle");
+        sessionStateRef.current = "idle";
+        disconnect();
+        onFallbackRequired?.(reason);
+        return false;
+      }
+    },
+    [
+      appendTranscript,
+      briefingStepIndex,
+      clearSetupWaiters,
+      context,
+      disconnect,
+      enabled,
+      flushPendingStartTurn,
+      language,
+      onFallbackRequired,
+      onTurnComplete,
+      scenarioId,
+      waitForSetupComplete,
+    ],
+  );
 
   const startBriefing = useCallback(
     async (stepIndexOverride?: number): Promise<boolean> => {
-      const connected = await connectLive(stepIndexOverride);
-      if (!connected) {
-        onFallbackRequired?.();
-      }
-      return connected;
+      return connectLive(stepIndexOverride);
     },
-    [connectLive, onFallbackRequired],
+    [connectLive],
   );
 
   const pauseBriefing = useCallback(() => {

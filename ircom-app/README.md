@@ -72,10 +72,16 @@ The GitHub repo root is not the Next.js app. In Vercel project settings, set **R
 | Variable | Required | Notes |
 |----------|----------|--------|
 | `GEMINI_API_KEY` | Yes (for live AI) | Server-only; never commit. Without it, `/api/teacher` returns demo fallback copy. |
-| `GEMINI_MODEL` | No | Defaults to `gemini-3-flash-preview` (REST: coach, chat, critique). |
-| `GEMINI_LIVE_MODEL` | No | Defaults to `gemini-2.5-flash-native-audio-preview-12-2025` (Atelier/Sprint voice). |
-| `GEMINI_TTS_MODEL` | No | Defaults to `gemini-2.5-flash-preview-tts` (voice fallback when Live unavailable). |
-| `VOICE_ENGINE` / `NEXT_PUBLIC_VOICE_ENGINE` | No | Defaults to `live` (Gemini Live audio). On failure, streams briefing text via `/api/atelier/narrate` — no browser speech synthesis. |
+| `GEMINI_MODEL` | No | Defaults to `gemini-2.5-flash` (REST: coach, chat, narrate stream). |
+| `GEMINI_LIVE_MODEL` | No | Defaults to `gemini-live-2.5-flash-preview` ([Live API](https://ai.google.dev/api) / BidiGenerateContent). |
+| `GEMINI_TTS_MODEL` | No | Deprecated — not used for briefing. |
+| `VOICE_ENGINE` / `NEXT_PUBLIC_VOICE_ENGINE` | No | Defaults to `live`. On Live failure, streams briefing text via `/api/atelier/narrate` only (no browser TTS). |
+
+### Briefing voice troubleshooting
+
+1. **Live audio:** DevTools → `POST /api/atelier/live-token` returns 200 and `token` starts with `auth_tokens/`. WebSocket uses `BidiGenerateContentConstrained` on `v1alpha`.
+2. **Model:** Use a [Live-capable model](https://ai.google.dev/gemini-api/docs/models), e.g. `GEMINI_LIVE_MODEL=gemini-live-2.5-flash-preview`.
+3. **Text fallback:** If Live fails, transcript still streams from `/api/atelier/narrate`; UI shows `voice-fallback-notice` and optional `voice-live-error` with the API reason.
 | `ANTHROPIC_API_KEY` | No | Optional in-app Claude copy pass (`/api/tools/claude`). |
 | `ADOBE_FIREFLY_API_KEY` | No | Reserved for future Firefly integration; guided link always available. |
 

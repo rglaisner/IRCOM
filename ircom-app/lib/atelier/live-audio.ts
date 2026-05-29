@@ -1,4 +1,4 @@
-/** PCM helpers for Gemini Live: 16 kHz mic in, 24 kHz playback out. */
+/** PCM helpers for Gemini Live: 16 kHz mic in, 24 kHz model output resampled to device rate. */
 
 export const LIVE_INPUT_SAMPLE_RATE = 16_000;
 export const LIVE_OUTPUT_SAMPLE_RATE = 24_000;
@@ -30,6 +30,40 @@ function base64ToInt16(base64: string): Int16Array {
   return new Int16Array(bytes.buffer);
 }
 
+function pcm16ToFloat32(pcm16: Int16Array): Float32Array {
+  const float32 = new Float32Array(pcm16.length);
+  for (let index = 0; index < pcm16.length; index += 1) {
+    float32[index] = (pcm16[index] ?? 0) / 0x80_00;
+  }
+  return float32;
+}
+
+function resampleLinear(
+  input: Float32Array,
+  inputRate: number,
+  outputRate: number,
+): Float32Array {
+  if (inputRate === outputRate || input.length === 0) {
+    return input;
+  }
+
+  const outputLength = Math.max(1, Math.round((input.length * outputRate) / inputRate));
+  const output = new Float32Array(outputLength);
+  const ratio = input.length / outputLength;
+
+  for (let index = 0; index < outputLength; index += 1) {
+    const sourceIndex = index * ratio;
+    const left = Math.floor(sourceIndex);
+    const right = Math.min(left + 1, input.length - 1);
+    const fraction = sourceIndex - left;
+    const leftSample = input[left] ?? 0;
+    const rightSample = input[right] ?? 0;
+    output[index] = leftSample + (rightSample - leftSample) * fraction;
+  }
+
+  return output;
+}
+
 export function encodePcmChunk(float32Pcm: Float32Array): { data: string; mimeType: string } {
   const pcm16 = floatTo16BitPcm(float32Pcm);
   return {
@@ -57,12 +91,12 @@ export class LiveAudioPlayer {
   }
 
   async playBase64Pcm(base64: string): Promise<void> {
-    if (this.muted || typeof window === "undefined") {
+    if (this.muted || typeof window === "undefined" || base64.trim().length === 0) {
       return;
     }
 
     if (!this.audioContext) {
-      this.audioContext = new AudioContext({ sampleRate: LIVE_OUTPUT_SAMPLE_RATE });
+      this.audioContext = new AudioContext();
     }
 
     if (this.audioContext.state === "suspended") {
@@ -70,13 +104,12 @@ export class LiveAudioPlayer {
     }
 
     const pcm16 = base64ToInt16(base64);
-    const float32 = new Float32Array(pcm16.length);
-    for (let index = 0; index < pcm16.length; index += 1) {
-      float32[index] = (pcm16[index] ?? 0) / 0x80_00;
-    }
+    const sourceFloat = pcm16ToFloat32(pcm16);
+    const contextRate = this.audioContext.sampleRate;
+    const playbackFloat = resampleLinear(sourceFloat, LIVE_OUTPUT_SAMPLE_RATE, contextRate);
 
-    const buffer = this.audioContext.createBuffer(1, float32.length, LIVE_OUTPUT_SAMPLE_RATE);
-    buffer.copyToChannel(float32, 0);
+    const buffer = this.audioContext.createBuffer(1, playbackFloat.length, contextRate);
+    buffer.getChannelData(0).set(playbackFloat);
 
     const source = this.audioContext.createBufferSource();
     source.buffer = buffer;
@@ -113,7 +146,11 @@ export class LiveMicCapture {
 
     this.processor.onaudioprocess = (event) => {
       const input = event.inputBuffer.getChannelData(0);
-      const downsampled = downsampleBuffer(input, this.audioContext?.sampleRate ?? 48_000, LIVE_INPUT_SAMPLE_RATE);
+      const downsampled = downsampleBuffer(
+        input,
+        this.audioContext?.sampleRate ?? 48_000,
+        LIVE_INPUT_SAMPLE_RATE,
+      );
       onChunk(downsampled);
     };
 

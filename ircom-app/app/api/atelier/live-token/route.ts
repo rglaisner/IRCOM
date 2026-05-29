@@ -101,9 +101,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     if (error instanceof Error) {
+      console.error({
+        msg: "live-token creation failed",
+        error: error.message,
+      });
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.error({ msg: "live-token unexpected error", error });
     return NextResponse.json({ error: "Unexpected server error." }, { status: 500 });
   }
 }

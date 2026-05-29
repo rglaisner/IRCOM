@@ -37,6 +37,7 @@ export function VoiceSessionPanel({
     isChatLoading,
     isLiveActive,
     isTextFallback,
+    liveFallbackReason,
     startBriefing,
     pauseBriefing,
     resumeBriefing,
@@ -129,6 +130,17 @@ export function VoiceSessionPanel({
           data-testid="voice-fallback-notice"
         >
           {t(language, "voiceFallbackNotice")}
+        </p>
+      ) : null}
+
+      {isTextFallback && liveFallbackReason ? (
+        <p
+          className="rounded-[var(--ircom-radius-md)] border border-[var(--ircom-border)] bg-[#f0587211] p-3 text-sm text-[var(--ircom-text-heading)]"
+          data-testid="voice-live-error"
+        >
+          {language === "fr"
+            ? `Audio Live indisponible : ${liveFallbackReason}`
+            : `Live audio unavailable: ${liveFallbackReason}`}
         </p>
       ) : null}
 

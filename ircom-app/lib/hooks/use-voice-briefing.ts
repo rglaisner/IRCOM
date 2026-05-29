@@ -84,6 +84,7 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     getOrchestratorForScenario(scenario),
   );
   const [textFallbackMode, setTextFallbackMode] = useState(false);
+  const [liveFallbackReason, setLiveFallbackReason] = useState<string | null>(null);
   const [qaTranscript, setQaTranscript] = useState("");
   const orchestratorRef = useRef(orchestrator);
   orchestratorRef.current = orchestrator;
@@ -107,8 +108,9 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     advanceOrchestratorAfterNarration();
   }, [advanceOrchestratorAfterNarration]);
 
-  const handleFallbackRequired = useCallback(() => {
+  const handleFallbackRequired = useCallback((reason: string | null) => {
     setTextFallbackMode(true);
+    setLiveFallbackReason(reason);
   }, []);
 
   const liveSession = useGeminiLiveSession({
@@ -116,7 +118,7 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     scenarioId: scenario.id,
     context,
     briefingStepIndex: orchestrator.stepIndex,
-    enabled: useLive && !textFallbackMode,
+    enabled: useLive,
     onTurnComplete: handleLiveTurnComplete,
     onFallbackRequired: handleFallbackRequired,
   });
@@ -139,16 +141,19 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
 
   const startBriefing = useCallback(async () => {
     onBriefingStart?.();
+    setTextFallbackMode(false);
+    setLiveFallbackReason(null);
+    liveSession.clearError();
+
     const started = startOrchestratorForScenario(scenario);
     setOrchestrator(started);
     stepIndexRef.current = started.stepIndex;
 
-    if (useLive && !textFallbackMode) {
+    if (useLive) {
       const connected = await liveSession.startBriefing(stepIndexRef.current);
       if (connected) {
         return;
       }
-      setTextFallbackMode(true);
     }
 
     await runTextFallbackNarration();
@@ -157,7 +162,6 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     onBriefingStart,
     runTextFallbackNarration,
     scenario,
-    textFallbackMode,
     useLive,
   ]);
 
@@ -227,6 +231,7 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
   useEffect(() => {
     setOrchestrator(getOrchestratorForScenario(scenario));
     setTextFallbackMode(false);
+    setLiveFallbackReason(null);
     setQaTranscript("");
     liveSession.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when scenario changes
@@ -272,6 +277,7 @@ export function useVoiceBriefing(options: UseVoiceBriefingOptions) {
     sessionState: liveSession.sessionState,
     transcript,
     errorMessage,
+    liveFallbackReason,
     isNarrating,
     isChatLoading: fallbackSession.isChatLoading,
     isLiveActive: useLive && !textFallbackMode && liveSession.sessionState !== "idle",

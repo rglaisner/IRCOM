@@ -1,8 +1,8 @@
 /** Central Gemini model routing — server and shared defaults. */
 
-export const GEMINI_MODEL_DEFAULT = "gemini-3-flash-preview";
-/** Sole product audio engine — briefing and raise-hand use Live WebSocket. */
-export const GEMINI_LIVE_MODEL_DEFAULT = "gemini-2.5-flash-native-audio-preview-12-2025";
+export const GEMINI_MODEL_DEFAULT = "gemini-2.5-flash";
+/** Sole product audio engine — briefing and raise-hand use Live WebSocket (BidiGenerateContent). */
+export const GEMINI_LIVE_MODEL_DEFAULT = "gemini-live-2.5-flash-preview";
 /** @deprecated Not used in product flow; briefing audio is Live-only, text fallback is narrate API. */
 export const GEMINI_TTS_MODEL_DEFAULT = "gemini-2.5-flash-preview-tts";
 export const VOICE_ENGINE_DEFAULT = "live";
